@@ -1,0 +1,20 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.idea/
+.vscode/
+
+# Node (none required at runtime, but in case you add tooling)
+node_modules/
+npm-debug.log*
+
+# Local rasterization / preview output (not part of the repo)
+_preview/
+# Ignore stray PNGs, but keep the committed screenshots under assets/
+*.png
+!assets/*.png
+
+# Stale tracker from older versions of this status line (no longer used)
+budget_tracker.json

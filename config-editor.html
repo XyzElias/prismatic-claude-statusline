@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prismatic — Claude Code Status Line Config</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0b0b0f;--card:#161620;--input:#1c1c26;--border:#2c2c3a;
+  --text:#d8d8e0;--dim:#8a8a99;--accent:#9b8cff;--on:#5ad6a0;
+  --off:#3f3f4c;--radius:9px;
+  /* prismatic brand gradient (turquoise → violet → magenta → gold) */
+  --prism:linear-gradient(100deg,#40e0d0,#9b8cff 40%,#ff7be6 70%,#ffc658);
+}
+body{
+  font-family:-apple-system,system-ui,'Segoe UI',sans-serif;
+  color:var(--text);font-size:14px;line-height:1.5;
+  background:
+    radial-gradient(900px 500px at 12% -8%, rgba(64,224,208,.10), transparent 60%),
+    radial-gradient(1000px 600px at 100% 0%, rgba(255,123,230,.10), transparent 55%),
+    var(--bg);
+  min-height:100vh;
+}
+
+/* ── Sticky preview top bar ── */
+.preview-bar{
+  position:sticky;top:0;z-index:50;
+  background:linear-gradient(180deg,#0c0c12,#08080c);
+  border-bottom:1px solid var(--border);
+  padding:16px 24px;
+  box-shadow:0 8px 24px -12px rgba(0,0,0,.8);
+}
+.preview-bar::after{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
+  background:var(--prism);opacity:.6;
+}
+.preview-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+.preview-label{font-size:10px;color:var(--dim);letter-spacing:.5px;text-transform:uppercase}
+.preview-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.preview-controls select{
+  background:var(--input);border:1px solid var(--border);border-radius:3px;
+  color:var(--text);padding:3px 20px 3px 6px;font-size:11px;font-family:inherit;
+  outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 5px center;
+}
+.pv-slider-label{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dim)}
+.pv-slider-label input[type=range]{
+  width:80px;height:4px;-webkit-appearance:none;appearance:none;
+  background:var(--border);border-radius:2px;outline:none;cursor:pointer;
+}
+.pv-slider-label input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+  background:#fff;cursor:pointer;box-shadow:0 0 0 3px rgba(155,140,255,.5);
+}
+#pv-usage-val{min-width:30px;text-align:right;color:var(--text);font-size:11px}
+#preview{
+  font-family:'CaskaydiaCove Nerd Font','FiraCode Nerd Font','JetBrainsMono Nerd Font','Cascadia Code','Fira Code','Consolas',monospace;
+  font-size:13px;line-height:1.7;white-space:pre;text-align:center;
+  padding:16px 12px;border-radius:10px;
+  background:radial-gradient(120% 140% at 50% 0%, #15151f, #0a0a0e);
+  border:1px solid var(--border);overflow-x:auto;
+}
+
+/* ── Main content ── */
+.main{padding:32px;max-width:1100px;margin:0 auto}
+.brand{display:flex;align-items:baseline;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+h1{
+  font-size:30px;font-weight:800;letter-spacing:-.5px;line-height:1;
+  background:var(--prism);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+.brand .h1-sub{font-size:14px;font-weight:600;color:var(--dim);letter-spacing:.3px}
+.sub{color:var(--dim);font-size:13px;margin-bottom:24px;max-width:640px}
+.sub code{background:var(--input);padding:1px 6px;border-radius:4px;font-size:12px;color:var(--text)}
+
+/* ── Two-column grid for cards ── */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid .full{grid-column:1/-1}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+
+/* ── Card ── */
+.card{
+  position:relative;background:linear-gradient(180deg,#181824,#141420);
+  border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;
+  transition:border-color .18s, transform .18s, box-shadow .18s;
+}
+.card:hover{border-color:#3a3a4d;transform:translateY(-1px);box-shadow:0 10px 28px -18px rgba(0,0,0,.9)}
+.card-title{font-size:11px;font-weight:700;color:#b9b9cc;letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-title::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--prism);flex-shrink:0}
+
+/* ── Inputs ── */
+input[type=number],input[type=text],select{
+  background:var(--input);border:1px solid var(--border);border-radius:4px;
+  color:var(--text);padding:5px 8px;font-size:13px;font-family:inherit;
+  outline:none;transition:border-color .15s, box-shadow .15s;
+}
+input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(155,140,255,.18)}
+input[type=number]{width:72px}
+input[type=text]{width:130px}
+select{
+  cursor:pointer;padding-right:22px;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 7px center;
+}
+input[type=color]{
+  width:28px;height:24px;border:1px solid var(--border);border-radius:3px;
+  cursor:pointer;background:none;padding:2px;
+}
+input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+input[type=color]::-webkit-color-swatch{border:none;border-radius:2px}
+
+/* ── Field ── */
+.field{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.field-label{min-width:100px;font-size:13px;color:var(--dim);flex-shrink:0;display:flex;align-items:center;gap:4px}
+.field-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:500px){.field-pair{grid-template-columns:1fr}}
+.field-color{display:flex;align-items:center;gap:6px}
+
+/* ── Info tooltip ── */
+.info{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:14px;height:14px;border-radius:50%;background:var(--border);
+  color:var(--dim);font-size:9px;font-weight:700;cursor:help;
+  position:relative;flex-shrink:0;font-style:italic;font-family:serif;
+}
+.info:hover::after{
+  content:attr(data-tip);position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);
+  background:#222;color:var(--text);border:1px solid var(--border);
+  padding:6px 10px;border-radius:4px;font-size:11px;font-weight:400;font-style:normal;font-family:-apple-system,system-ui,sans-serif;
+  white-space:normal;z-index:100;pointer-events:none;width:240px;line-height:1.5;text-transform:none;letter-spacing:normal;
+}
+
+/* ── Toggle ── */
+.toggle{position:relative;display:inline-block;width:34px;height:18px;flex-shrink:0}
+.toggle input{position:absolute;opacity:0;width:0;height:0}
+.toggle span{
+  position:absolute;inset:0;background:var(--off);border-radius:9px;
+  cursor:pointer;transition:.2s;
+}
+.toggle span::after{
+  content:'';position:absolute;width:14px;height:14px;border-radius:50%;
+  background:#888;top:2px;left:2px;transition:.2s;
+}
+.toggle input:checked+span{background:var(--on)}
+.toggle input:checked+span::after{transform:translateX(16px);background:#fff}
+
+/* ── Pill list ── */
+.pill-item{
+  display:flex;align-items:center;gap:8px;padding:6px 10px;
+  background:var(--input);border:1px solid var(--border);border-radius:4px;
+  margin-bottom:4px;cursor:grab;user-select:none;
+}
+.pill-item:active{cursor:grabbing}
+.pill-item .handle{color:var(--dim);font-size:13px;cursor:grab;line-height:1}
+.pill-item .name{font-size:12px;font-weight:500;min-width:56px;color:var(--text)}
+.pill-item input[type=text]{width:100px;font-size:12px;padding:3px 6px}
+.pill-item input[type=number]{width:46px;font-size:12px;padding:3px 6px}
+.pill-item.dragging{opacity:.3}
+.pill-item .bar-label{font-size:10px;color:var(--dim)}
+
+/* ── Threshold ── */
+.thr{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.thr input[type=number]{width:56px}
+.thr-label{font-size:11px;color:var(--dim);min-width:32px}
+
+/* ── Gradient ── */
+.grad{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.grad .label{min-width:64px;font-size:12px;color:var(--dim);text-transform:capitalize}
+.grad .arrow{color:var(--dim);font-size:11px}
+
+/* ── Install instructions ── */
+.instructions{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px 18px;margin-bottom:12px;font-size:12px;line-height:1.8;
+}
+.instructions b{color:var(--text);font-size:13px}
+.instructions code{background:var(--input);padding:1px 5px;border-radius:3px;font-size:11px}
+.instructions ol{padding-left:18px;margin:8px 0 0}
+.instructions li{margin-bottom:2px;color:var(--dim)}
+
+/* ── Buttons ── */
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{
+  padding:8px 18px;border-radius:7px;border:1px solid var(--border);
+  font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;transition:.15s;
+  background:var(--input);color:var(--text);
+}
+.btn:hover{border-color:var(--accent);color:#fff}
+.btn-primary{background:var(--prism);color:#11111a;border:none;font-weight:700}
+.btn-primary:hover{filter:brightness(1.08) saturate(1.1)}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(50px);
+  background:#222;color:#eee;border:1px solid var(--border);
+  padding:7px 18px;border-radius:4px;font-size:12px;opacity:0;transition:.25s;z-index:99;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ── Modal ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:90}
+.overlay.show{display:flex}
+.modal{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;max-width:640px;width:90%;max-height:80vh;overflow-y:auto;
+}
+.modal h3{font-size:14px;font-weight:600;margin-bottom:12px}
+.modal pre{
+  background:#0a0a0a;color:var(--text);padding:14px;border-radius:4px;
+  font-size:11px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;margin-bottom:12px;
+}
+.modal .actions{justify-content:flex-end}
+</style>
+</head>
+<body>
+
+<!-- Sticky Preview -->
+<div class="preview-bar">
+  <div class="preview-header">
+    <span class="preview-label">Live Preview</span>
+    <div class="preview-controls">
+      <select id="pv-model" onchange="renderPreview()" title="Preview model">
+        <option value="opus" selected>Opus</option>
+        <option value="sonnet">Sonnet</option>
+        <option value="haiku">Haiku</option>
+        <option value="fable">Fable</option>
+      </select>
+      <label class="pv-slider-label" title="Simulated usage percentage for progress bars">Usage
+        <input type="range" id="pv-usage" min="0" max="100" value="42" oninput="document.getElementById('pv-usage-val').textContent=this.value+'%';renderPreview()">
+        <span id="pv-usage-val">42%</span>
+      </label>
+    </div>
+  </div>
+  <div id="preview"></div>
+</div>
+
+<!-- Form -->
+<div class="main">
+  <div class="brand">
+    <h1>Prismatic</h1>
+    <span class="h1-sub">· Claude Code Status Line</span>
+  </div>
+  <p class="sub">Design your status line visually, then click <b>Copy YAML</b> and save it to <code>~/.claude/statusline_config.yml</code>. Everything updates in the live preview above.</p>
+
+  <div class="grid">
+
+    <!-- Style -->
+    <div class="card">
+      <div class="card-title">Style</div>
+      <div class="field">
+        <span class="field-label">Pill style <span class="info" data-tip="Nerd Font requires a patched font installed. Unicode and ASCII work on any terminal.">i</span></span>
+        <select id="style" onchange="update()">
+          <option value="nerd">Nerd Font</option>
+          <option value="unicode" selected>Unicode</option>
+          <option value="ascii">ASCII</option>
+        </select>
+      </div>
+      <div class="field-pair">
+        <div class="field">
+          <span class="field-label">Labels <span class="info" data-tip="Show a text label row below each pill segment.">i</span></span>
+          <label class="toggle"><input type="checkbox" id="show_labels" checked onchange="update()"><span></span></label>
+        </div>
+        <div class="field">
+          <span class="field-label">Frame <span class="info" data-tip="Rounded border around the status line.">i</span></span>
+          <label class="toggle"><input type="checkbox" id="frame_enabled" checked onchange="update()"><span></span></label>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-label">Path depth <span class="info" data-tip="How many directory levels to show. 2 = last two folders.">i</span></span>
+        <input type="number" id="path_segments" value="2" min="1" max="10" onchange="update()">
+      </div>
+    </div>
+
+    <!-- Usage & cost info -->
+    <div class="card">
+      <div class="card-title">Usage &amp; Cost</div>
+      <p style="font-size:12px;color:var(--dim);line-height:1.7;margin:0">
+        The <b style="color:var(--text)">USAGE</b> pill shows your Claude <b style="color:var(--text)">Pro/Max</b>
+        rate-limit percentage and reset time. It auto-hides on API / pay-per-use plans, which receive no
+        rate-limit data from Claude Code. Toggle <b style="color:var(--text)">7d</b> on the USAGE segment to also
+        show the weekly window.<br><br>
+        The <b style="color:var(--text)">COST</b> pill shows the estimated cost of the
+        <b style="color:var(--text)">current session</b> (a client-side estimate from Claude Code that may differ
+        from your actual bill). There is no monthly-budget tracking — Claude Code does not expose cumulative spend.
+      </p>
+    </div>
+
+    <!-- Segments -->
+    <div class="card full">
+      <div class="card-title">Segments <span class="info" data-tip="Each segment is a pill. Drag to reorder, toggle to show/hide.">i</span></div>
+      <div id="pill-list"></div>
+    </div>
+
+    <!-- Colors -->
+    <div class="card">
+      <div class="card-title">Colors</div>
+      <div id="color-grid"></div>
+    </div>
+
+    <!-- Model Themes + Thresholds stacked -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="card-title">Model Gradients <span class="info" data-tip="Two-color gradient applied to the model name. Automatically matched by model ID.">i</span></div>
+        <div id="model-themes"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Thresholds <span class="info" data-tip="Progress bar colors based on percentage filled.">i</span></div>
+        <div id="thresholds"></div>
+      </div>
+    </div>
+
+    <!-- Instructions + Buttons -->
+    <div class="full">
+      <div class="instructions">
+        <b>How to install</b>
+        <ol>
+          <li>Place <code>statusline.js</code> in <code>~/.claude/</code></li>
+          <li>Add this to your <code>~/.claude/settings.json</code>:<br>
+            <code>"statusLine": { "type": "command", "command": "node ~/.claude/statusline.js" }</code></li>
+          <li><i>(Optional)</i> Copy or download the YAML below and save it as <code>~/.claude/statusline_config.yml</code>. If you skip this, the script creates it with defaults on first run.</li>
+          <li>Restart Claude Code</li>
+        </ol>
+        <span style="color:var(--dim)">Full guide &amp; Nerd Font setup: <code>github.com/XyzElias/prismatic-claude-statusline</code></span>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="showYaml()">Copy YAML</button>
+        <button class="btn" onclick="downloadYaml()">Download</button>
+        <button class="btn" onclick="resetDefaults()">Reset</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="yaml-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3>Your Configuration</h3>
+    <pre id="yaml-output"></pre>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="copyYaml()">Copy to Clipboard</button>
+      <button class="btn" onclick="downloadYaml()">Download File</button>
+      <button class="btn" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DEFAULTS={style:"unicode",show_labels:true,path_segments:2,frame:{enabled:true,top_left:"\u256d",top_right:"\u256e",bot_left:"\u2570",bot_right:"\u256f",horizontal:"\u2500",vertical:"\u2502"},pills:{model:{enabled:true,label:"MODEL",order:1},path:{enabled:true,label:"PATH",order:2},context:{enabled:true,label:"CONTEXT",order:3,bar_width:10},rate:{enabled:true,label:"USAGE",order:4,bar_width:10,show_seven_day:false},diff:{enabled:true,label:"DIFF",order:5},cost:{enabled:true,label:"COST",order:6},time:{enabled:true,label:"TIME",order:7}},colors:{pill_bg:[58,62,72],frame:[120,120,138],label:[120,120,138],dim:[200,185,175],path:[120,200,255],time:[130,210,255],diff_add:[60,255,110],diff_sep:[70,95,90],diff_rm:[255,75,75],cost_grad:[[255,220,60],[255,170,30]],model_themes:{opus:[[175,100,255],[255,120,230]],sonnet:[[40,230,160],[120,255,180]],haiku:[[255,140,60],[255,90,140]],fable:[[64,224,208],[255,198,88]],fallback:[[200,200,230],[240,240,255]]},thresholds:[{below:40,color:[50,255,160]},{below:65,color:[200,255,50]},{below:80,color:[255,210,30]},{below:92,color:[255,120,30]},{below:101,color:[255,50,50]}]}};
+const STYLE_CHARS={nerd:{left:"\ue0b6",right:"\ue0b4"},unicode:{left:"\u2590",right:"\u258c"},ascii:{left:"[",right:"]"}};
+const PILL_KEYS=["model","path","context","rate","diff","cost","time"];
+const PILL_INFO={model:"Shows the active Claude model name with a colored gradient.",path:"Current working directory, truncated to the configured depth.",context:"How much of the context window is used, with a progress bar.",rate:"Subscription usage (Claude Pro/Max): 5-hour rate-limit percentage and reset time. Automatically hidden on API / pay-per-use plans, which receive no rate-limit data.",diff:"Lines added and removed in the current session.",cost:"Estimated cost of the current session (client-side estimate).",time:"How long the current session has been running."};
+const COLOR_FIELDS=[["colors.pill_bg","Pill BG","Background color of all pill segments."],["colors.frame","Frame","Border frame color."],["colors.label","Labels","Label text color below pills."],["colors.dim","Dim text","Secondary text (units, separators)."],["colors.path","Path","Directory path text color."],["colors.time","Time","Session duration text color."],["colors.diff_add","Diff +","Added lines color."],["colors.diff_sep","Diff sep","Separator between +/-."],["colors.diff_rm","Diff −","Removed lines color."]];
+
+let state=JSON.parse(JSON.stringify(DEFAULTS));
+
+function rgbHex([r,g,b]){return"#"+[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("")}
+function hexRgb(h){const m=h.match(/[0-9a-f]{2}/gi);return m?m.map(v=>parseInt(v,16)):[0,0,0]}
+function get(p){let n=state;for(const k of p.split(".")){n=n?.[k]}return n}
+function set(p,v){const k=p.split(".");let n=state;for(let i=0;i<k.length-1;i++)n=n[k[i]];n[k[k.length-1]]=v}
+
+function buildPills(){
+  const el=document.getElementById("pill-list");el.innerHTML="";
+  const sorted=PILL_KEYS.slice().sort((a,b)=>state.pills[a].order-state.pills[b].order);
+  sorted.forEach(key=>{
+    const p=state.pills[key];const hasBar=["context","rate"].includes(key);
+    const d=document.createElement("div");d.className="pill-item";d.draggable=true;d.dataset.key=key;
+    d.innerHTML=`<span class="handle">&#x2630;</span>`
+      +`<label class="toggle"><input type="checkbox" ${p.enabled?"checked":""} onchange="state.pills['${key}'].enabled=this.checked;update()"><span></span></label>`
+      +`<span class="name">${key}</span>`
+      +`<input type="text" value="${p.label}" onchange="state.pills['${key}'].label=this.value;update()">`
+      +(hasBar?`<span class="bar-label">bar</span><input type="number" value="${p.bar_width||10}" min="3" max="30" onchange="state.pills['${key}'].bar_width=+this.value;update()">`:"")
+      +(key==="rate"?`<label class="bar-label" style="display:flex;align-items:center;gap:3px" title="Also show the 7-day usage window">7d<input type="checkbox" ${p.show_seven_day?"checked":""} onchange="state.pills.rate.show_seven_day=this.checked;update()"></label>`:"")
+      +`<span class="info" data-tip="${PILL_INFO[key]||''}">i</span>`;
+    el.appendChild(d);
+  });
+  initDrag();
+}
+
+function buildColors(){
+  const el=document.getElementById("color-grid");el.innerHTML="";
+  COLOR_FIELDS.forEach(([p,label,tip])=>{
+    const v=get(p);const d=document.createElement("div");d.className="field";
+    d.innerHTML=`<span class="field-label">${label} <span class="info" data-tip="${tip}">i</span></span><div class="field-color"><input type="color" value="${rgbHex(v)}" onchange="set('${p}',hexRgb(this.value));update()"></div>`;
+    el.appendChild(d);
+  });
+  const cg=state.colors.cost_grad;const d=document.createElement("div");d.className="field";
+  d.innerHTML=`<span class="field-label">Cost grad <span class="info" data-tip="Two-color gradient for cost text.">i</span></span><div class="field-color"><input type="color" value="${rgbHex(cg[0])}" onchange="state.colors.cost_grad[0]=hexRgb(this.value);update()"><span style="color:var(--dim);font-size:11px">\u2192</span><input type="color" value="${rgbHex(cg[1])}" onchange="state.colors.cost_grad[1]=hexRgb(this.value);update()"></div>`;
+  el.appendChild(d);
+}
+
+function buildThemes(){
+  const el=document.getElementById("model-themes");el.innerHTML="";
+  const labels={opus:"Opus",sonnet:"Sonnet",haiku:"Haiku",fable:"Fable",fallback:"Other"};
+  for(const[name,grad]of Object.entries(state.colors.model_themes)){
+    const d=document.createElement("div");d.className="grad";
+    d.innerHTML=`<span class="label">${labels[name]||name}</span><input type="color" value="${rgbHex(grad[0])}" onchange="state.colors.model_themes['${name}'][0]=hexRgb(this.value);update()"><span class="arrow">\u2192</span><input type="color" value="${rgbHex(grad[1])}" onchange="state.colors.model_themes['${name}'][1]=hexRgb(this.value);update()">`;
+    el.appendChild(d);
+  }
+}
+
+function buildThresholds(){
+  const el=document.getElementById("thresholds");el.innerHTML="";
+  state.colors.thresholds.forEach((t,i)=>{
+    const isLast=i===state.colors.thresholds.length-1;
+    const d=document.createElement("div");d.className="thr";
+    if(isLast){
+      d.innerHTML=`<span class="thr-label">100%+</span><input type="color" value="${rgbHex(t.color)}" onchange="state.colors.thresholds[${i}].color=hexRgb(this.value);update()">`;
+    }else{
+      d.innerHTML=`<span class="thr-label">&lt;</span><input type="number" value="${t.below}" min="0" max="100" onchange="state.colors.thresholds[${i}].below=+this.value;update()"><span class="thr-label">%</span><input type="color" value="${rgbHex(t.color)}" onchange="state.colors.thresholds[${i}].color=hexRgb(this.value);update()">`;
+    }
+    el.appendChild(d);
+  });
+}
+
+function initDrag(){
+  const list=document.getElementById("pill-list");let dragged=null;
+  list.querySelectorAll(".pill-item").forEach(item=>{
+    item.addEventListener("dragstart",()=>{dragged=item;item.classList.add("dragging")});
+    item.addEventListener("dragend",()=>{
+      item.classList.remove("dragging");dragged=null;
+      list.querySelectorAll(".pill-item").forEach((el,i)=>{state.pills[el.dataset.key].order=i+1});
+      update();
+    });
+    item.addEventListener("dragover",e=>{
+      e.preventDefault();if(item===dragged)return;
+      const r=item.getBoundingClientRect();
+      if(e.clientY<r.top+r.height/2)list.insertBefore(dragged,item);
+      else list.insertBefore(dragged,item.nextSibling);
+    });
+  });
+}
+
+// ── Preview ───────────────────────────────────────────────
+function lerp(a,b,t){return Math.round(a+(b-a)*t)}
+function rgb(c){return`rgb(${c[0]},${c[1]},${c[2]})`}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function gradSpans(text,s,e){
+  const n=Math.max(text.length-1,1);
+  return[...text].map((ch,i)=>{const c=[lerp(s[0],e[0],i/n),lerp(s[1],e[1],i/n),lerp(s[2],e[2],i/n)];return`<span style="color:${rgb(c)}">${esc(ch)}</span>`}).join("");
+}
+
+function renderPreview(){
+  const s=state,bgPill=s.colors.pill_bg,bgStr=rgb(bgPill),frameC=rgb(s.colors.frame),
+    labelC=rgb(s.colors.label),dimC=rgb(s.colors.dim),ch=STYLE_CHARS[s.style]||STYLE_CHARS.unicode;
+
+  // Read preview controls
+  const pvModel=document.getElementById("pv-model").value;
+  const pvUsage=+document.getElementById("pv-usage").value;
+
+  const modelNames={opus:"Claude Opus 4.8 (1M)",sonnet:"Claude Sonnet 4.6",haiku:"Claude Haiku 4.5",fable:"Claude Fable 5"};
+  const fullPath=["~","dev","my-project","src","components"];
+  const nSeg=s.path_segments;
+  const demoPath=fullPath.length>nSeg?"\u2026/"+fullPath.slice(-nSeg).join("/"):fullPath.join("/");
+  const demo={model:modelNames[pvModel]||modelNames.opus,path:demoPath,pct:pvUsage,ctx:"1.0M",
+    cost:1.85,time:"12m 34s",add:142,rm:38,rlPct:pvUsage,rlReset:"14:30",weekPct:Math.round(pvUsage*0.7),weekReset:"Mon"};
+  const theme=s.colors.model_themes[pvModel]||s.colors.model_themes.fallback;
+
+  function tColor(v){for(const t of s.colors.thresholds){if(v<t.below)return t.color}return s.colors.thresholds.at(-1).color}
+  function bar(pct,w,color){
+    const filled=Math.min(Math.floor(pct*w/100),w),track=bgPill.map(v=>Math.min(255,v+55));
+    let o="";for(let i=0;i<w;i++){
+      if(i<filled){const t=i/Math.max(w-1,1);const cc=[0,1,2].map(j=>Math.min(255,Math.round(color[j]*(1-t*[.2,.12,.08][j]))));o+=`<span style="color:${rgb(cc)}">\u2501</span>`}
+      else o+=`<span style="color:${rgb(track)}">\u2501</span>`
+    }return o;
+  }
+
+  function makePill(innerHtml,label){
+    const tmp=document.createElement("span");tmp.innerHTML=innerHtml;
+    const innerLen=tmp.textContent.length;
+    const totalLen=1+1+innerLen+1+1;
+    const html=`<span style="color:${bgStr}">${esc(ch.left)}</span><span style="background:${bgStr}"> ${innerHtml} </span><span style="color:${bgStr}">${esc(ch.right)}</span>`;
+    return{html,label,textLen:totalLen};
+  }
+
+  const pills=[];
+  const sorted=Object.entries(s.pills).sort((a,b)=>a[1].order-b[1].order);
+  for(const[key,pcfg]of sorted){
+    if(!pcfg.enabled)continue;const bw=pcfg.bar_width||10;const lbl=pcfg.label;
+    if(key==="model")pills.push(makePill(`<b>${gradSpans(demo.model,theme[0],theme[1])}</b>`,lbl));
+    else if(key==="path")pills.push(makePill(`<b><span style="color:${rgb(s.colors.path)}">${esc(demo.path)}</span></b>`,lbl));
+    else if(key==="context"){const c=tColor(pvUsage);pills.push(makePill(`<span style="color:${rgb(c)}"><b>${pvUsage}%</b></span><span style="color:${dimC}"> / ${demo.ctx}  </span>${bar(pvUsage,bw,c)}`,lbl))}
+    else if(key==="rate"){const c=tColor(demo.rlPct);let html=`<span style="color:${rgb(c)}"><b>${demo.rlPct}%</b></span>  ${bar(demo.rlPct,bw,c)}<span style="color:${dimC}">  ${demo.rlReset}</span>`;if(pcfg.show_seven_day){const c7=tColor(demo.weekPct);html+=`<span style="color:${dimC}">  ·  </span><span style="color:${rgb(c7)}"><b>7d ${demo.weekPct}%</b></span>`}pills.push(makePill(html,lbl))}
+    else if(key==="diff")pills.push(makePill(`<span style="color:${rgb(s.colors.diff_add)}"><b>+${demo.add}</b></span><span style="color:${rgb(s.colors.diff_sep)}">  </span><span style="color:${rgb(s.colors.diff_rm)}"><b>\u2212${demo.rm}</b></span>`,lbl));
+    else if(key==="cost"){const cg=s.colors.cost_grad;pills.push(makePill(`<b>${gradSpans("$"+demo.cost.toFixed(2),cg[0],cg[1])}</b>`,lbl))}
+    else if(key==="time")pills.push(makePill(`<b><span style="color:${rgb(s.colors.time)}">${demo.time}</span></b>`,lbl));
+  }
+
+  const pillLine=pills.map(p=>p.html).join(" ");
+  const labelParts=pills.map(p=>{
+    const lbl=p.label||"";const w=p.textLen;
+    const pad=Math.max(0,w-lbl.length);const lp=Math.floor(pad/2);
+    return`<span style="color:${labelC}">${" ".repeat(lp)}${esc(lbl)}${" ".repeat(pad-lp)}</span>`;
+  });
+  const labelLine=labelParts.join(" ");
+  const totalW=pills.reduce((sum,p)=>sum+p.textLen,0)+(pills.length>1?pills.length-1:0);
+
+  let html="";const fr=s.frame;
+  if(fr.enabled){
+    const hChar=fr.horizontal||"\u2500",vChar=fr.vertical||"\u2502";
+    const hBar=esc(hChar.repeat(totalW+2));
+    html+=`<span style="color:${frameC}">${esc(fr.top_left||"\u256d")}${hBar}${esc(fr.top_right||"\u256e")}</span>\n`;
+    html+=`<span style="color:${frameC}">${esc(vChar)}</span> ${pillLine} <span style="color:${frameC}">${esc(vChar)}</span>\n`;
+    if(s.show_labels)html+=`<span style="color:${frameC}">${esc(vChar)}</span> ${labelLine} <span style="color:${frameC}">${esc(vChar)}</span>\n`;
+    html+=`<span style="color:${frameC}">${esc(fr.bot_left||"\u2570")}${hBar}${esc(fr.bot_right||"\u256f")}</span>`;
+  }else{
+    html+=pillLine;if(s.show_labels)html+="\n"+labelLine;
+  }
+  document.getElementById("preview").innerHTML=html;
+}
+
+// ── YAML ──────────────────────────────────────────────────
+function genYaml(){
+  const s=state,L=[],c=a=>`[${a.join(", ")}]`,g=a=>`[${c(a[0])}, ${c(a[1])}]`;
+  L.push("# Claude Code Status Line \u2014 Configuration","#","# Style: nerd | unicode | ascii","");
+  L.push(`style: ${s.style}`,"");
+  L.push(`show_labels: ${s.show_labels}`,"");
+  L.push("pills:");
+  const sorted=Object.entries(s.pills).sort((a,b)=>a[1].order-b[1].order);
+  for(const[key,p]of sorted){
+    L.push(`  ${key}:`);L.push(`    enabled: ${p.enabled}`);L.push(`    label: ${p.label}`);L.push(`    order: ${p.order}`);
+    if(p.bar_width!=null&&["context","rate"].includes(key))L.push(`    bar_width: ${p.bar_width}`);
+    if(key==="rate")L.push(`    show_seven_day: ${p.show_seven_day===true}`);
+    L.push("");
+  }
+  L.push("colors:");
+  L.push(`  pill_bg: ${c(s.colors.pill_bg)}`);L.push(`  frame: ${c(s.colors.frame)}`);L.push(`  label: ${c(s.colors.label)}`);
+  L.push(`  dim: ${c(s.colors.dim)}`);L.push(`  path: ${c(s.colors.path)}`);L.push(`  time: ${c(s.colors.time)}`);
+  L.push(`  diff_add: ${c(s.colors.diff_add)}`);L.push(`  diff_sep: ${c(s.colors.diff_sep)}`);L.push(`  diff_rm: ${c(s.colors.diff_rm)}`);
+  L.push(`  cost_grad: ${g(s.colors.cost_grad)}`,"");
+  // Map 'fallback' back to 'default' in YAML output
+  L.push("  model_themes:");
+  for(const[n,gr]of Object.entries(s.colors.model_themes)){
+    const yamlKey=n==="fallback"?"default":n;
+    L.push(`    ${yamlKey}: ${g(gr)}`);
+  }
+  L.push("");
+  L.push("  thresholds:");
+  s.colors.thresholds.forEach((t,i)=>{
+    const isLast=i===s.colors.thresholds.length-1;
+    L.push(`    - below: ${isLast?999:t.below}`);L.push(`      color: ${c(t.color)}`);
+  });
+  L.push("");
+  L.push("frame:");L.push(`  enabled: ${s.frame.enabled}`);
+  L.push(`  top_left: "${s.frame.top_left}"`);L.push(`  top_right: "${s.frame.top_right}"`);
+  L.push(`  bot_left: "${s.frame.bot_left}"`);L.push(`  bot_right: "${s.frame.bot_right}"`);
+  L.push(`  horizontal: "${s.frame.horizontal}"`);L.push(`  vertical: "${s.frame.vertical}"`,"");
+  L.push(`path_segments: ${s.path_segments}`);
+  return L.join("\n");
+}
+
+function showYaml(){
+  const y=genYaml();document.getElementById("yaml-output").textContent=y;
+  document.getElementById("yaml-modal").classList.add("show");
+  navigator.clipboard.writeText(y).then(()=>toast("Copied to clipboard!")).catch(()=>{});
+}
+function copyYaml(){navigator.clipboard.writeText(genYaml()).then(()=>toast("Copied to clipboard!"))}
+function downloadYaml(){
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([genYaml()],{type:"text/yaml"}));
+  a.download="statusline_config.yml";a.click();toast("Downloaded!");
+}
+function closeModal(){document.getElementById("yaml-modal").classList.remove("show")}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2000)}
+function resetDefaults(){state=JSON.parse(JSON.stringify(DEFAULTS));buildAll();update();toast("Reset!")}
+
+function update(){
+  state.style=document.getElementById("style").value;
+  state.show_labels=document.getElementById("show_labels").checked;
+  state.frame.enabled=document.getElementById("frame_enabled").checked;
+  state.path_segments=+document.getElementById("path_segments").value;
+  renderPreview();
+}
+
+function buildAll(){
+  document.getElementById("style").value=state.style;
+  document.getElementById("show_labels").checked=state.show_labels;
+  document.getElementById("frame_enabled").checked=state.frame.enabled;
+  document.getElementById("path_segments").value=state.path_segments;
+  buildPills();buildColors();buildThemes();buildThresholds();
+}
+
+buildAll();renderPreview();
+</script>
+</body>
+</html>

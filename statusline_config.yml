@@ -1,0 +1,104 @@
+# Claude Code Status Line — Configuration
+#
+# This file is OPTIONAL. If it does not exist, statusline.js creates it with
+# these exact defaults on first run. Edit it by hand, or use the visual editor
+# (config-editor.html) to generate it. Changes apply on your next interaction
+# with Claude Code.
+#
+# Pill style: nerd | unicode | ascii
+#   nerd    — Powerline glyphs for rounded pill caps (requires a Nerd Font)
+#   unicode — Unicode block characters (works in any modern terminal)
+#   ascii   — Plain [brackets] (maximum compatibility)
+# See docs/nerd-fonts.md if you want the rounded "nerd" caps.
+
+style: unicode
+
+# Show the small text label row beneath each pill.
+show_labels: true
+
+pills:
+  model:
+    enabled: true
+    label: MODEL
+    order: 1
+
+  path:
+    enabled: true
+    label: PATH
+    order: 2
+
+  context:
+    enabled: true
+    label: CONTEXT
+    order: 3
+    bar_width: 10
+
+  # Subscription usage (Claude Pro/Max). Auto-hides on API/pay-per-use plans,
+  # which do not receive rate-limit data from Claude Code.
+  rate:
+    enabled: true
+    label: USAGE
+    order: 4
+    bar_width: 10
+    show_seven_day: false   # also show the 7-day window next to the 5-hour one
+
+  diff:
+    enabled: true
+    label: DIFF
+    order: 5
+
+  # Estimated cost of the CURRENT session (client-side estimate from Claude Code).
+  cost:
+    enabled: true
+    label: COST
+    order: 6
+
+  time:
+    enabled: true
+    label: TIME
+    order: 7
+
+colors:
+  pill_bg: [58, 62, 72]
+  frame: [120, 120, 138]
+  label: [120, 120, 138]
+  dim: [200, 185, 175]
+  path: [120, 200, 255]
+  time: [130, 210, 255]
+  diff_add: [60, 255, 110]
+  diff_sep: [70, 95, 90]
+  diff_rm: [255, 75, 75]
+  cost_grad: [[255, 220, 60], [255, 170, 30]]
+
+  # Two-color gradient per model, matched by model id/name (case-insensitive).
+  model_themes:
+    opus: [[175, 100, 255], [255, 120, 230]]
+    sonnet: [[40, 230, 160], [120, 255, 180]]
+    haiku: [[255, 140, 60], [255, 90, 140]]
+    fable: [[64, 224, 208], [255, 198, 88]]
+    default: [[200, 200, 230], [240, 240, 255]]
+
+  # Progress-bar / percentage colors by fill level (first match wins).
+  thresholds:
+    - below: 40
+      color: [50, 255, 160]
+    - below: 65
+      color: [200, 255, 50]
+    - below: 80
+      color: [255, 210, 30]
+    - below: 92
+      color: [255, 120, 30]
+    - below: 999
+      color: [255, 50, 50]
+
+frame:
+  enabled: true
+  top_left: "╭"
+  top_right: "╮"
+  bot_left: "╰"
+  bot_right: "╯"
+  horizontal: "─"
+  vertical: "│"
+
+# How many trailing directories of the working path to show.
+path_segments: 2
