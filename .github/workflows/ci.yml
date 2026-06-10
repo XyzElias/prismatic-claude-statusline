@@ -33,12 +33,3 @@ jobs:
             git --no-pager diff --stat -- assets/*.svg
             exit 1
           fi
-
-      - name: Embedded editor is in sync
-        run: |
-          node tools/embed-editor.js
-          if ! git diff --quiet -- statusline.js; then
-            echo "::error::Embedded editor is stale — run: node tools/embed-editor.js"
-            git --no-pager diff --stat -- statusline.js
-            exit 1
-          fi

@@ -76,27 +76,17 @@ If your `settings.json` already has other settings, just add `"statusLine": { ..
 
 Quit and reopen Claude Code (or start a new session). The status line appears at the bottom. Done!
 
-On first run, the script writes two files into `~/.claude/`:
-- `statusline_config.yml` — your config (with defaults). Leave it, edit it by hand, or generate it with the visual editor.
-- `config-editor.html` — the visual editor (see below).
-
-See [Configuration](configuration.md).
+On first run, the script writes `~/.claude/statusline_config.yml` (your config, with defaults). Leave it as-is, edit it by hand, or generate it with the visual editor. See [Configuration](configuration.md).
 
 ## The visual config editor
 
-You don't need to download this separately — `statusline.js` carries it embedded and writes `config-editor.html` into `~/.claude/` automatically on first run. It's a self-contained web page you open in your browser to design your config and copy the generated YAML; it does **not** run with Claude Code.
+There's nothing extra to install. The editor is hosted online:
 
-Open it any time:
+**→ [Open the visual editor](https://xyzelias.github.io/prismatic-claude-statusline/config-editor.html)**
 
-```bash
-open ~/.claude/config-editor.html        # macOS
-xdg-open ~/.claude/config-editor.html    # Linux
-```
-```powershell
-start "$HOME\.claude\config-editor.html"  # Windows PowerShell
-```
+It's a self-contained web page that runs entirely in your browser (it does **not** run with Claude Code and sends nothing anywhere). Design your status line, click **Copy YAML**, and save the result to `~/.claude/statusline_config.yml`.
 
-…or just **double-click it** in your file manager. Design your status line, click **Copy YAML**, and save the result to `~/.claude/statusline_config.yml`. (The standalone file also lives in the repo as [`config-editor.html`](../config-editor.html) if you ever want a fresh copy.)
+Prefer to run it offline? Download [`config-editor.html`](../config-editor.html) from the repo and open the local file in your browser — same thing.
 
 ## Windows
 

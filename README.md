@@ -14,6 +14,8 @@
 [![GitHub stars](https://img.shields.io/github/stars/XyzElias/prismatic-claude-statusline?style=flat&color=ffc658&logo=github)](https://github.com/XyzElias/prismatic-claude-statusline/stargazers)
 ![Last commit](https://img.shields.io/github/last-commit/XyzElias/prismatic-claude-statusline?color=ff7be6)
 
+**[🎨 Open the visual editor →](https://xyzelias.github.io/prismatic-claude-statusline/config-editor.html)**
+
 </div>
 
 ## What is this?
@@ -29,30 +31,7 @@ Claude Code lets you replace the bar at the bottom of the screen with the output
 - **No dependencies.** One `.js` file. No `npm install`, no packages, nothing to keep updated.
 - **No API tokens used.** The status line runs locally; it never calls the API.
 - **Reliable by design.** Every pill is driven by data Claude Code actually provides. (See [Why there is no monthly-budget pill](#why-no-monthly-budget-pill).)
-- **Configure it visually.** Open `config-editor.html` in your browser, drag the segments around, pick colors, and copy the generated config — with a live preview.
-
-## Features
-
-- 🎨 **Per-model gradient themes** — the model name is tinted with a two-color gradient, so you can tell Opus from Sonnet from Haiku from Fable at a glance.
-- 📊 **Color-coded context bar** — green when you have room, shading through yellow and orange to red as the context window fills.
-- 📈 **Subscription usage** — shows your Claude Pro/Max 5-hour rate-limit percentage and reset time. Automatically hidden on API / pay-per-use plans.
-- ✏️ **Session diff & cost** — lines added/removed and the estimated cost of the current session.
-- 🧩 **Fully configurable** — reorder, rename, enable/disable any segment; tweak every color; pick a frame style. By hand in YAML, or with the included visual editor.
-- 🔤 **Three rendering styles** — `nerd` (Powerline glyphs), `unicode` (works everywhere), or `ascii` (maximum compatibility).
-
-## Gallery
-
-<div align="center">
-
-<img src="assets/hero.svg" alt="A full status line in a terminal window" width="100%">
-
-<br><br>
-
-<img src="assets/models.svg" alt="Per-model gradient themes: Opus violet to magenta, Sonnet emerald to mint, Haiku amber to rose, Fable turquoise to gold" width="48%">
-&nbsp;
-<img src="assets/context-anim.svg" alt="Animated context bar filling up while its color shifts from green through orange to red" width="48%">
-
-</div>
+- **Configure it visually.** A [live editor in your browser](https://xyzelias.github.io/prismatic-claude-statusline/config-editor.html) — drag the segments around, pick colors, copy the generated config. Nothing to download.
 
 ## Quick start
 
@@ -94,15 +73,18 @@ curl -fsSL https://raw.githubusercontent.com/XyzElias/prismatic-claude-statuslin
 
 **3. Restart Claude Code.** That's it. ✨
 
-On first run, the script sets everything up for you in `~/.claude/`:
-- **`statusline_config.yml`** — the config file (with sensible defaults).
-- **`config-editor.html`** — the [visual config editor](#configuration), bundled right inside `statusline.js`, so it's there without any extra download.
-
-So a single command is all you need. Want the rounded Powerline pill caps in the hero image? See the [Nerd Font guide](docs/nerd-fonts.md) — or stay on the default `unicode` style, which needs no special font.
-
-> **Open the editor any time:** double-click `~/.claude/config-editor.html`, or run `start ~/.claude/config-editor.html` (Windows) / `open ~/.claude/config-editor.html` (macOS) / `xdg-open ~/.claude/config-editor.html` (Linux).
+On first run the script creates `~/.claude/statusline_config.yml` with sensible defaults, so a single command is all you need. Want to tweak it? Use the **[visual editor in your browser](https://xyzelias.github.io/prismatic-claude-statusline/config-editor.html)** (nothing to install) and save the result to that file. Want the rounded Powerline pill caps from the banner? See the [Nerd Font guide](docs/nerd-fonts.md) — or stay on the default `unicode` style, which needs no special font.
 
 > **Windows:** the command above works as-is if you have Git Bash installed (the default for most Claude Code users on Windows). If you only have PowerShell, see the [installation guide](docs/installation.md#windows) for the one-line alternative.
+
+## Features
+
+- 🎨 **Per-model gradient themes** — the model name is tinted with a two-color gradient, so you can tell Opus from Sonnet from Haiku from Fable at a glance.
+- 📊 **Color-coded context bar** — green when you have room, shading through yellow and orange to red as the context window fills.
+- 📈 **Subscription usage** — shows your Claude Pro/Max 5-hour rate-limit percentage and reset time. Automatically hidden on API / pay-per-use plans.
+- ✏️ **Session diff & cost** — lines added/removed and the estimated cost of the current session.
+- 🧩 **Fully configurable** — reorder, rename, enable/disable any segment; tweak every color; pick a frame style. By hand in YAML, or with the visual editor.
+- 🔤 **Three rendering styles** — `nerd` (Powerline glyphs), `unicode` (works everywhere), or `ascii` (maximum compatibility).
 
 ## Anatomy
 
@@ -122,17 +104,31 @@ So a single command is all you need. Want the rounded Powerline pill caps in the
 
 Every segment can be reordered, renamed, or turned off. See [Configuration](docs/configuration.md).
 
+## Gallery
+
+<div align="center">
+
+<img src="assets/hero.svg" alt="A full status line in a terminal window" width="100%">
+
+<br><br>
+
+<img src="assets/models.svg" alt="Per-model gradient themes: Opus violet to magenta, Sonnet emerald to mint, Haiku amber to rose, Fable turquoise to gold" width="48%">
+&nbsp;
+<img src="assets/context-states.svg" alt="The context bar changes color with fill level: green, lime, orange, red" width="48%">
+
+</div>
+
 ## Configuration
 
 Two ways to configure:
 
-- **Visual editor (recommended):** `statusline.js` writes `config-editor.html` into `~/.claude/` on first run, so it's already on your machine — just open it in any browser (no install, nothing to run). Drag to reorder segments, toggle them on/off, pick colors and per-model gradients, and watch a **live preview** update as you go. Click **Copy YAML** and save it to `~/.claude/statusline_config.yml`. *(The standalone [`config-editor.html`](config-editor.html) also lives in this repo.)*
+- **Visual editor (recommended):** design your status line in the browser — **[open it live →](https://xyzelias.github.io/prismatic-claude-statusline/config-editor.html)** (no install, nothing to download). Drag to reorder segments, toggle them on/off, pick colors and per-model gradients, and watch a **live preview** update as you go. Click **Copy YAML** and save it to `~/.claude/statusline_config.yml`. *(The editor also lives in this repo as [`config-editor.html`](config-editor.html) if you'd rather run it offline.)*
 - **By hand:** edit `~/.claude/statusline_config.yml` directly. Every option is documented in [`docs/configuration.md`](docs/configuration.md) and in the comments of the file itself.
 
 <div align="center">
-<img src="assets/config-editor.png" alt="The visual config editor: a live preview at the top, with cards for style, segments, colors and per-model gradients below" width="92%">
+<a href="https://xyzelias.github.io/prismatic-claude-statusline/config-editor.html"><img src="assets/config-editor.png" alt="The visual config editor: a live preview at the top, with cards for style, segments, colors and per-model gradients below" width="92%"></a>
 <br>
-<em>The bundled visual editor — live preview on top, drag-to-reorder segments, color pickers and model gradients below.</em>
+<em>The visual editor — live preview on top, drag-to-reorder segments, color pickers and model gradients below.</em>
 </div>
 
 Changes take effect on your next interaction with Claude Code.
@@ -177,10 +173,7 @@ If you want to watch your spend over time, use the [Anthropic Console](https://c
 
 ## Contributing
 
-Issues and pull requests are welcome — color themes, extra segments, and platform fixes especially. The status line logic is one readable file (`statusline.js`); the visual editor is `config-editor.html`. Two small build helpers keep things in sync:
-
-- [`tools/render-svg.js`](tools/render-svg.js) regenerates the README images (`node tools/render-svg.js`).
-- [`tools/embed-editor.js`](tools/embed-editor.js) re-embeds `config-editor.html` into `statusline.js` as a base64 blob (`node tools/embed-editor.js`) — **run this after editing the editor**, so a single `statusline.js` download keeps carrying the latest editor. (The blob lives at the very bottom of `statusline.js`; everything above it is the normal, readable logic.)
+Issues and pull requests are welcome — color themes, extra segments, and platform fixes especially. The status line is one readable file (`statusline.js`); the visual editor is `config-editor.html` (served live via GitHub Pages). The README images are generated by [`tools/render-svg.js`](tools/render-svg.js) (`node tools/render-svg.js`), so they stay in sync with the real output — CI checks this on every push.
 
 ## License
 

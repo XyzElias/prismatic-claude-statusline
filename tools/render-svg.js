@@ -249,59 +249,6 @@ function buildContextStates() {
   write("context-states.svg", svgDoc(W, H, inner));
 }
 
-// ── 4b) Animated context bar — fills left→right, color green→red, looping ──
-function buildContextAnim() {
-  const N = 18, cellW = 13, gap = 3, cellH = 8;
-  const barW = N * cellW + (N - 1) * gap;
-  const numW = 96;                         // room for "97% / 200k"
-  const pillX = CARD_M, py0 = 60;
-  const numX = pillX + PILL_PADX;
-  const barX = numX + numW + 14;
-  const pillW = PILL_PADX * 2 + numW + 14 + barW;
-  const W = pillW + CARD_M * 2, H = py0 + PILL_H + CARD_M;
-  const cellY = py0 + (PILL_H - cellH) / 2;
-  const baseY = py0 + PILL_H / 2 + FS * 0.34;
-  const track = PILL_BG.map(v => Math.min(255, v + 55));
-
-  // number states (value → threshold color), each visible for a window
-  const nums = [
-    { v: 28, win: [2, 18] }, { v: 58, win: [18, 40] },
-    { v: 84, win: [40, 62] }, { v: 97, win: [62, 90] },
-  ];
-
-  let css = `.lcell{opacity:0;animation-duration:4.4s;animation-iteration-count:infinite;animation-timing-function:ease-out}`
-    + `.num{opacity:0;animation-duration:4.4s;animation-iteration-count:infinite}`;
-  for (let i = 0; i < N; i++) {
-    const s = +((i / N) * 66).toFixed(2), s2 = +(s + 2).toFixed(2);
-    const off = s === 0 ? `0%` : `0%,${s}%`;
-    css += `@keyframes c${i}{${off}{opacity:0}${s2}%,88%{opacity:1}95%,100%{opacity:0}}`;
-  }
-  nums.forEach((n, i) => {
-    const [a, b] = n.win;
-    css += `@keyframes n${i}{0%,${a}%{opacity:0}${a + 1}%,${b}%{opacity:1}${b + 1}%,100%{opacity:0}}`;
-  });
-
-  let inner = `<style>${css}</style>`;
-  inner += `<text x="${pillX}" y="34" font-size="13" font-weight="700" fill="rgb(210,212,222)">Context bar — fills up, color shifts green → red</text>`;
-  inner += `<rect x="${pillX}" y="${py0}" width="${pillW.toFixed(1)}" height="${PILL_H}" rx="7" fill="${rgb(PILL_BG)}"/>`;
-  // animated number readouts (stacked, only one visible at a time)
-  nums.forEach((n, i) => {
-    const c = thresholdColor(n.v);
-    inner += `<text x="${numX}" y="${baseY.toFixed(1)}" font-size="${FS}" font-weight="700" class="num" style="animation-name:n${i}" fill="${rgb(c)}">${n.v}%<tspan fill="${rgb(DIM)}" font-weight="400"> / 200k</tspan></text>`;
-  });
-  // bar: dim track cells + animated colored cells on top
-  for (let i = 0; i < N; i++) {
-    const x = barX + i * (cellW + gap);
-    inner += `<rect x="${x}" y="${cellY}" width="${cellW}" height="${cellH}" rx="2" fill="${rgb(track)}"/>`;
-  }
-  for (let i = 0; i < N; i++) {
-    const x = barX + i * (cellW + gap);
-    const c = thresholdColor(((i + 1) / N) * 100);
-    inner += `<rect x="${x}" y="${cellY}" width="${cellW}" height="${cellH}" rx="2" fill="${rgb(c)}" class="lcell" style="animation-name:c${i}"/>`;
-  }
-  write("context-anim.svg", svgDoc(W, H, inner));
-}
-
 // ── 4) Anatomy — labeled status line + numbered legend ──
 function buildAnatomy() {
   const pills = makePills({
@@ -434,7 +381,6 @@ function main() {
   buildHero();
   buildModels();
   buildContextStates();
-  buildContextAnim();
   buildAnatomy();
   console.log("Done.");
 }
