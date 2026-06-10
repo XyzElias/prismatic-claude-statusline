@@ -76,25 +76,27 @@ If your `settings.json` already has other settings, just add `"statusLine": { ..
 
 Quit and reopen Claude Code (or start a new session). The status line appears at the bottom. Done!
 
-On first run, the script writes a default config to `~/.claude/statusline_config.yml`. You can leave it as-is, edit it by hand, or generate one with the [visual editor](../config-editor.html). See [Configuration](configuration.md).
+On first run, the script writes two files into `~/.claude/`:
+- `statusline_config.yml` — your config (with defaults). Leave it, edit it by hand, or generate it with the visual editor.
+- `config-editor.html` — the visual editor (see below).
 
-## Optional — the visual config editor
+See [Configuration](configuration.md).
 
-The steps above download only `statusline.js`, which is all you need to run the status line. The visual editor is a **separate, optional** file: it's a self-contained web page you open in your browser to design your config and copy the generated YAML. It does **not** run with Claude Code.
+## The visual config editor
 
-To get it, download `config-editor.html` (anywhere you like — `~/.claude/` is convenient):
+You don't need to download this separately — `statusline.js` carries it embedded and writes `config-editor.html` into `~/.claude/` automatically on first run. It's a self-contained web page you open in your browser to design your config and copy the generated YAML; it does **not** run with Claude Code.
+
+Open it any time:
 
 ```bash
-# macOS / Linux / Git Bash
-curl -fsSL https://raw.githubusercontent.com/XyzElias/prismatic-claude-statusline/main/config-editor.html -o ~/.claude/config-editor.html
+open ~/.claude/config-editor.html        # macOS
+xdg-open ~/.claude/config-editor.html    # Linux
 ```
-
 ```powershell
-# Windows PowerShell
-curl.exe -fsSL https://raw.githubusercontent.com/XyzElias/prismatic-claude-statusline/main/config-editor.html -o "$HOME\.claude\config-editor.html"
+start "$HOME\.claude\config-editor.html"  # Windows PowerShell
 ```
 
-Then just **double-click it** (or open it from your browser's File → Open) — no server, no install. On Windows you can also run `start "$HOME\.claude\config-editor.html"` from PowerShell. Design your status line, click **Copy YAML**, and save the result to `~/.claude/statusline_config.yml`.
+…or just **double-click it** in your file manager. Design your status line, click **Copy YAML**, and save the result to `~/.claude/statusline_config.yml`. (The standalone file also lives in the repo as [`config-editor.html`](../config-editor.html) if you ever want a fresh copy.)
 
 ## Windows
 
