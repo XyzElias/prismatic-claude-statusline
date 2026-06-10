@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Syntax check
+        run: node --check statusline.js
+
+      - name: Smoke test — statusline renders output
+        run: |
+          json='{"model":{"display_name":"Opus"},"workspace":{"current_dir":"/a/b"},"context_window":{"used_percentage":12,"context_window_size":200000},"cost":{"total_cost_usd":0.12,"total_duration_ms":1000}}'
+          out=$(printf '%s' "$json" | node statusline.js)
+          if [ -z "$out" ]; then echo "::error::statusline.js produced no output"; exit 1; fi
+          printf '%s' "$out" | head -c 200
+
+      - name: README images are in sync
+        run: |
+          node tools/render-svg.js
+          if ! git diff --quiet -- assets/*.svg; then
+            echo "::error::SVG assets are out of date — run: node tools/render-svg.js"
+            git --no-pager diff --stat -- assets/*.svg
+            exit 1
+          fi
+
+      - name: Embedded editor is in sync
+        run: |
+          node tools/embed-editor.js
+          if ! git diff --quiet -- statusline.js; then
+            echo "::error::Embedded editor is stale — run: node tools/embed-editor.js"
+            git --no-pager diff --stat -- statusline.js
+            exit 1
+          fi

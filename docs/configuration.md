@@ -113,6 +113,10 @@ Each theme is `[[startR,G,B], [endR,G,B]]`. Add your own key for any model name 
 
 The context bar (and the usage bar) change color based on how full they are. The first threshold whose `below` value exceeds the current percentage wins.
 
+<div align="center">
+<img src="../assets/context-states.svg" alt="The context bar at four fill levels showing green, lime, orange and red" width="70%">
+</div>
+
 ```yaml
   thresholds:
     - below: 40

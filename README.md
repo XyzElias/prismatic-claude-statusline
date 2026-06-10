@@ -6,6 +6,7 @@
 
 **A prismatic, highly customizable, zero-dependency status line for [Claude Code](https://code.claude.com) — truecolor gradient model pills, a color-coded context bar, and a live visual config editor.**
 
+[![CI](https://github.com/XyzElias/prismatic-claude-statusline/actions/workflows/ci.yml/badge.svg)](https://github.com/XyzElias/prismatic-claude-statusline/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-9b8cff.svg)](LICENSE)
 ![Zero dependencies](https://img.shields.io/badge/dependencies-0-40e0d0.svg)
 ![Runtime: Node.js](https://img.shields.io/badge/runtime-Node.js-339933.svg?logo=node.js&logoColor=white)
@@ -49,7 +50,7 @@ Claude Code lets you replace the bar at the bottom of the screen with the output
 
 <img src="assets/models.svg" alt="Per-model gradient themes: Opus violet to magenta, Sonnet emerald to mint, Haiku amber to rose, Fable turquoise to gold" width="48%">
 &nbsp;
-<img src="assets/context-states.svg" alt="The context bar changes color with fill level: green, lime, orange, red" width="48%">
+<img src="assets/context-anim.svg" alt="Animated context bar filling up while its color shifts from green through orange to red" width="48%">
 
 </div>
 

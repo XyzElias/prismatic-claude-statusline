@@ -19,7 +19,9 @@ const ROOT = path.join(__dirname, "..");
 const EDITOR = path.join(ROOT, "config-editor.html");
 const SCRIPT = path.join(ROOT, "statusline.js");
 
-const html = fs.readFileSync(EDITOR, "utf-8");
+// Normalize line endings to LF so the embed is identical on every platform
+// (Windows checkout vs. Linux CI runner) — keeps the CI embed-sync check stable.
+const html = fs.readFileSync(EDITOR, "utf-8").replace(/\r\n/g, "\n");
 const b64 = Buffer.from(html, "utf-8").toString("base64");
 
 let js = fs.readFileSync(SCRIPT, "utf-8");
