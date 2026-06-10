@@ -1,0 +1,21 @@
+name: 💡 Feature request
+description: Suggest a new segment, theme, or option
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      description: Describe the segment, theme, or option — and what it would show or do.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it useful?
+  - type: input
+    id: data
+    attributes:
+      label: Data source (for new segments)
+      description: Which field from the Claude Code status line JSON would it use, if any?
+      placeholder: e.g. effort.level, output_style.name, workspace.repo

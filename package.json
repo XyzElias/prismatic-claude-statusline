@@ -1,0 +1,42 @@
+{
+  "name": "prismatic-claude-statusline",
+  "version": "1.0.0",
+  "description": "A prismatic, highly customizable, zero-dependency status line for Claude Code — truecolor gradient model pills, a color-coded context bar, and a live visual config editor.",
+  "keywords": [
+    "claude-code",
+    "claude",
+    "anthropic",
+    "statusline",
+    "status-line",
+    "status-bar",
+    "ccstatusline",
+    "powerline",
+    "truecolor",
+    "ansi",
+    "terminal",
+    "cli",
+    "dotfiles",
+    "developer-tools"
+  ],
+  "homepage": "https://github.com/XyzElias/prismatic-claude-statusline#readme",
+  "bugs": {
+    "url": "https://github.com/XyzElias/prismatic-claude-statusline/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XyzElias/prismatic-claude-statusline.git"
+  },
+  "license": "MIT",
+  "author": "Elias Felder",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=14"
+  },
+  "files": [
+    "statusline.js",
+    "statusline_config.yml",
+    "config-editor.html",
+    "docs"
+  ],
+  "dependencies": {}
+}

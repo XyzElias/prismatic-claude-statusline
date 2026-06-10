@@ -1,0 +1,36 @@
+name: 🐞 Bug report
+description: Something isn't rendering or behaving correctly
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: Steps, and ideally the output of running statusline.js with mock input.
+      placeholder: |
+        echo '{"model":{"display_name":"Opus"},"workspace":{"current_dir":"/a/b"},"context_window":{"used_percentage":42,"context_window_size":200000},"cost":{"total_cost_usd":0.1,"total_duration_ms":1000}}' | node statusline.js
+      render: shell
+  - type: input
+    id: os
+    attributes:
+      label: OS & terminal
+      placeholder: e.g. Windows 11 + Windows Terminal, macOS + iTerm2, Ubuntu + GNOME Terminal
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Node.js & Claude Code versions
+      placeholder: e.g. node v20.11.0, Claude Code 2.1.x
+  - type: textarea
+    id: config
+    attributes:
+      label: Your statusline_config.yml (if customized)
+      render: yaml
