@@ -324,9 +324,58 @@ function buildSocial() {
   write("social-preview.svg", svgDoc(W, H, inner));
 }
 
+// ── 7) Animated demo — pills pop into a terminal window, looping ──
+// Self-contained CSS keyframes; animates on GitHub when used via <img>.
+function buildClip() {
+  const pills = makePills({
+    model: "Fable 5", modelKey: "fable", path: "…/projects/statusline",
+    ctxPct: 42, ctxSize: "1.0M", w5: 23, reset5: "14:30",
+    add: 142, rm: 38, cost: 1.85, time: "12m 34s",
+  });
+  const TB = 42;
+  const oy = CARD_M + TB;
+  const fw = frameWidth(pills);
+  const frameH = FRAME_PAD + PILL_H + FRAME_PAD;   // no label row
+  const py = oy + FRAME_PAD;
+  const ox = CARD_M;
+  const W = fw + CARD_M * 2, H = oy + frameH + CARD_M;
+
+  // terminal chrome (matches hero.svg)
+  let chrome = "";
+  [["#ff5f56", 0], ["#ffbd2e", 20], ["#27c93f", 40]].forEach(([c, dx]) =>
+    chrome += `<circle cx="${CARD_M + 8 + dx}" cy="${CARD_M + 16}" r="6" fill="${c}"/>`);
+  chrome += `<text x="${W / 2}" y="${CARD_M + 20}" font-size="12" text-anchor="middle" fill="${TITLE_C}">Claude Code</text>`;
+  chrome += `<line x1="${CARD_M}" y1="${oy - 8}" x2="${W - CARD_M}" y2="${oy - 8}" stroke="rgb(38,42,52)" stroke-width="1"/>`;
+
+  // static frame + per-pill animated groups
+  let body = `<rect x="${ox}" y="${oy}" width="${fw.toFixed(1)}" height="${frameH}" rx="11" fill="none" stroke="${rgb(FRAME)}" stroke-width="1.5"/>`;
+  let x = ox + FRAME_PAD;
+  pills.forEach((p, i) => {
+    const r = renderPill(p, x, py, false, 0);
+    body += `<g class="pill" style="animation-name:pop${i}">${r.svg}</g>`;
+    x += r.w + PILL_GAP;
+  });
+
+  // looping staggered keyframes (percentages of one shared timeline)
+  const T = 5.2, stagger = 7;
+  let css = `.pill{transform-box:fill-box;transform-origin:center;`
+    + `animation-duration:${T}s;animation-iteration-count:infinite;`
+    + `animation-timing-function:cubic-bezier(.2,.75,.2,1)}`;
+  for (let i = 0; i < pills.length; i++) {
+    const s = 4 + i * stagger, a = s + 3, b = s + 7;
+    css += `@keyframes pop${i}{`
+      + `0%,${s}%{opacity:0;transform:translateY(7px) scale(.8)}`
+      + `${a}%{opacity:1;transform:translateY(0) scale(1.06)}`
+      + `${b}%,90%{opacity:1;transform:translateY(0) scale(1)}`
+      + `97%,100%{opacity:0;transform:translateY(7px) scale(.8)}}`;
+  }
+  write("demo.svg", svgDoc(W, H, `<style>${css}</style>` + chrome + body));
+}
+
 function main() {
   if (!fs.existsSync(OUT)) fs.mkdirSync(OUT, { recursive: true });
   console.log("Rendering SVG assets →", OUT);
+  buildClip();
   buildBanner();
   buildSocial();
   buildHero();

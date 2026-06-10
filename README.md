@@ -20,7 +20,9 @@
 Claude Code lets you replace the bar at the bottom of the screen with the output of any script. This is a single, self-contained Node.js script (`statusline.js`) that turns that bar into a row of **gradient "pills"** showing your model, working directory, context-window usage, subscription usage, session diff, cost, and elapsed time — wrapped in a rounded frame.
 
 <div align="center">
-<img src="assets/hero.svg" alt="The status line: a rounded frame containing gradient pills for model, path, context, usage, diff, cost and time" width="100%">
+<img src="assets/demo.svg" alt="Animated demo: gradient pills popping into the status line one after another" width="100%">
+<br>
+<em>Pills for model, path, context, usage, diff, cost and time — in a rounded frame.</em>
 </div>
 
 - **No dependencies.** One `.js` file. No `npm install`, no packages, nothing to keep updated.
@@ -40,6 +42,10 @@ Claude Code lets you replace the bar at the bottom of the screen with the output
 ## Gallery
 
 <div align="center">
+
+<img src="assets/hero.svg" alt="A full status line in a terminal window" width="100%">
+
+<br><br>
 
 <img src="assets/models.svg" alt="Per-model gradient themes: Opus violet to magenta, Sonnet emerald to mint, Haiku amber to rose, Fable turquoise to gold" width="48%">
 &nbsp;
