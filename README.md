@@ -133,7 +133,7 @@ Two ways to configure:
 - **By hand:** edit `~/.claude/statusline_config.yml` directly. Every option is documented in [`docs/configuration.md`](docs/configuration.md) and in the comments of the file itself.
 
 <div align="center">
-<a href="https://xyzelias.github.io/prismatic-claude-statusline/config-editor.html"><img src="assets/config-editor.png" alt="The visual config editor: a live preview at the top, with cards for style, segments, colors and per-model gradients below" width="92%"></a>
+<a href="https://xyzelias.github.io/prismatic-claude-statusline/config-editor.html"><img src="assets/config-editor.png?v=1.1" alt="The visual config editor: a live preview at the top, with cards for style, segments, colors and per-model gradients below" width="92%"></a>
 <br>
 <em>The visual editor — live preview on top, drag-to-reorder segments, color pickers and model gradients below.</em>
 </div>
