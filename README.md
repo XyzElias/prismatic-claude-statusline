@@ -39,22 +39,27 @@ You need [Claude Code](https://code.claude.com) and [Node.js](https://nodejs.org
 
 **1. Put `statusline.js` in your `~/.claude/` folder.** Pick the line for your shell:
 
+**macOS / Linux / Git Bash:**
+
 ```bash
-# macOS / Linux / Git Bash
 curl -fsSL https://raw.githubusercontent.com/XyzElias/prismatic-claude-statusline/main/statusline.js -o ~/.claude/statusline.js
 ```
 
-```powershell
-# Windows PowerShell  (in PowerShell, "curl" is an alias for Invoke-WebRequest,
-# so use curl.exe — or the Invoke-WebRequest form below)
-curl.exe -fsSL https://raw.githubusercontent.com/XyzElias/prismatic-claude-statusline/main/statusline.js -o "$HOME\.claude\statusline.js"
+**Windows PowerShell** — `curl` is an alias for `Invoke-WebRequest`, so use `curl.exe`:
 
-# …or the native PowerShell command:
+```powershell
+curl.exe -fsSL https://raw.githubusercontent.com/XyzElias/prismatic-claude-statusline/main/statusline.js -o "$HOME\.claude\statusline.js"
+```
+
+…or the native PowerShell command:
+
+```powershell
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/XyzElias/prismatic-claude-statusline/main/statusline.js" -OutFile "$HOME\.claude\statusline.js"
 ```
 
+**Windows CMD:**
+
 ```bat
-:: Windows CMD
 curl -fsSL https://raw.githubusercontent.com/XyzElias/prismatic-claude-statusline/main/statusline.js -o "%USERPROFILE%\.claude\statusline.js"
 ```
 
@@ -139,13 +144,15 @@ Changes take effect on your next interaction with Claude Code.
 
 Updating is the same one-liner you used to install — it overwrites **only** `statusline.js`:
 
+**macOS / Linux / Git Bash:**
+
 ```bash
-# macOS / Linux / Git Bash
 curl -fsSL https://raw.githubusercontent.com/XyzElias/prismatic-claude-statusline/main/statusline.js -o ~/.claude/statusline.js
 ```
 
+**Windows PowerShell:**
+
 ```powershell
-# Windows PowerShell
 curl.exe -fsSL https://raw.githubusercontent.com/XyzElias/prismatic-claude-statusline/main/statusline.js -o "$HOME\.claude\statusline.js"
 ```
 
