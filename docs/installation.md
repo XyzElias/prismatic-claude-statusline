@@ -126,6 +126,8 @@ If something's off, head to [Troubleshooting](troubleshooting.md).
 
 To update later, just download `statusline.js` again (Step 1) — it replaces the old one. Your `statusline_config.yml` is left untouched, so your customizations survive.
 
+If a new release adds a segment or color (for example the **BRANCH** pill added in v1.1), the script **migrates your config for you**: on its next run it inserts only the new keys — with their defaults and explanatory comments — directly into your existing file, without changing a single line you already have. The migration is idempotent, so it's safe to update as often as you like. After updating, open the [visual editor](https://xyzelias.github.io/prismatic-claude-statusline/config-editor.html) if you'd like to tweak the new segment.
+
 ## Uninstalling
 
 1. Remove the `statusLine` block from `~/.claude/settings.json` (or run `/statusline` in Claude Code and ask it to remove the status line).

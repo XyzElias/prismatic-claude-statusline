@@ -27,10 +27,17 @@ pills:
     label: PATH
     order: 2
 
+  # Current Git branch of the working directory. Auto-hides when the directory
+  # is not inside a Git repository.
+  branch:
+    enabled: true
+    label: BRANCH
+    order: 3
+
   context:
     enabled: true
     label: CONTEXT
-    order: 3
+    order: 4
     bar_width: 10
 
   # Subscription usage (Claude Pro/Max). Auto-hides on API/pay-per-use plans,
@@ -38,25 +45,25 @@ pills:
   rate:
     enabled: true
     label: USAGE
-    order: 4
+    order: 5
     bar_width: 10
     show_seven_day: false   # also show the 7-day window next to the 5-hour one
 
   diff:
     enabled: true
     label: DIFF
-    order: 5
+    order: 6
 
   # Estimated cost of the CURRENT session (client-side estimate from Claude Code).
   cost:
     enabled: true
     label: COST
-    order: 6
+    order: 7
 
   time:
     enabled: true
     label: TIME
-    order: 7
+    order: 8
 
 colors:
   pill_bg: [58, 62, 72]
@@ -64,6 +71,7 @@ colors:
   label: [120, 120, 138]
   dim: [200, 185, 175]
   path: [120, 200, 255]
+  branch: [180, 160, 255]
   time: [130, 210, 255]
   diff_add: [60, 255, 110]
   diff_sep: [70, 95, 90]

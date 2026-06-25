@@ -365,11 +365,11 @@ input[type=color]::-webkit-color-swatch{border:none;border-radius:2px}
 <div class="toast" id="toast"></div>
 
 <script>
-const DEFAULTS={style:"unicode",show_labels:true,path_segments:2,frame:{enabled:true,top_left:"\u256d",top_right:"\u256e",bot_left:"\u2570",bot_right:"\u256f",horizontal:"\u2500",vertical:"\u2502"},pills:{model:{enabled:true,label:"MODEL",order:1},path:{enabled:true,label:"PATH",order:2},context:{enabled:true,label:"CONTEXT",order:3,bar_width:10},rate:{enabled:true,label:"USAGE",order:4,bar_width:10,show_seven_day:false},diff:{enabled:true,label:"DIFF",order:5},cost:{enabled:true,label:"COST",order:6},time:{enabled:true,label:"TIME",order:7}},colors:{pill_bg:[58,62,72],frame:[120,120,138],label:[120,120,138],dim:[200,185,175],path:[120,200,255],time:[130,210,255],diff_add:[60,255,110],diff_sep:[70,95,90],diff_rm:[255,75,75],cost_grad:[[255,220,60],[255,170,30]],model_themes:{opus:[[175,100,255],[255,120,230]],sonnet:[[40,230,160],[120,255,180]],haiku:[[255,140,60],[255,90,140]],fable:[[64,224,208],[255,198,88]],fallback:[[200,200,230],[240,240,255]]},thresholds:[{below:40,color:[50,255,160]},{below:65,color:[200,255,50]},{below:80,color:[255,210,30]},{below:92,color:[255,120,30]},{below:101,color:[255,50,50]}]}};
+const DEFAULTS={style:"unicode",show_labels:true,path_segments:2,frame:{enabled:true,top_left:"\u256d",top_right:"\u256e",bot_left:"\u2570",bot_right:"\u256f",horizontal:"\u2500",vertical:"\u2502"},pills:{model:{enabled:true,label:"MODEL",order:1},path:{enabled:true,label:"PATH",order:2},branch:{enabled:true,label:"BRANCH",order:3},context:{enabled:true,label:"CONTEXT",order:4,bar_width:10},rate:{enabled:true,label:"USAGE",order:5,bar_width:10,show_seven_day:false},diff:{enabled:true,label:"DIFF",order:6},cost:{enabled:true,label:"COST",order:7},time:{enabled:true,label:"TIME",order:8}},colors:{pill_bg:[58,62,72],frame:[120,120,138],label:[120,120,138],dim:[200,185,175],path:[120,200,255],branch:[180,160,255],time:[130,210,255],diff_add:[60,255,110],diff_sep:[70,95,90],diff_rm:[255,75,75],cost_grad:[[255,220,60],[255,170,30]],model_themes:{opus:[[175,100,255],[255,120,230]],sonnet:[[40,230,160],[120,255,180]],haiku:[[255,140,60],[255,90,140]],fable:[[64,224,208],[255,198,88]],fallback:[[200,200,230],[240,240,255]]},thresholds:[{below:40,color:[50,255,160]},{below:65,color:[200,255,50]},{below:80,color:[255,210,30]},{below:92,color:[255,120,30]},{below:101,color:[255,50,50]}]}};
 const STYLE_CHARS={nerd:{left:"\ue0b6",right:"\ue0b4"},unicode:{left:"\u2590",right:"\u258c"},ascii:{left:"[",right:"]"}};
-const PILL_KEYS=["model","path","context","rate","diff","cost","time"];
-const PILL_INFO={model:"Shows the active Claude model name with a colored gradient.",path:"Current working directory, truncated to the configured depth.",context:"How much of the context window is used, with a progress bar.",rate:"Subscription usage (Claude Pro/Max): 5-hour rate-limit percentage and reset time. Automatically hidden on API / pay-per-use plans, which receive no rate-limit data.",diff:"Lines added and removed in the current session.",cost:"Estimated cost of the current session (client-side estimate).",time:"How long the current session has been running."};
-const COLOR_FIELDS=[["colors.pill_bg","Pill BG","Background color of all pill segments."],["colors.frame","Frame","Border frame color."],["colors.label","Labels","Label text color below pills."],["colors.dim","Dim text","Secondary text (units, separators)."],["colors.path","Path","Directory path text color."],["colors.time","Time","Session duration text color."],["colors.diff_add","Diff +","Added lines color."],["colors.diff_sep","Diff sep","Separator between +/-."],["colors.diff_rm","Diff −","Removed lines color."]];
+const PILL_KEYS=["model","path","branch","context","rate","diff","cost","time"];
+const PILL_INFO={model:"Shows the active Claude model name with a colored gradient.",path:"Current working directory, truncated to the configured depth.",branch:"Current Git branch of the working directory. Automatically hidden when the directory is not inside a Git repository.",context:"How much of the context window is used, with a progress bar.",rate:"Subscription usage (Claude Pro/Max): 5-hour rate-limit percentage and reset time. Automatically hidden on API / pay-per-use plans, which receive no rate-limit data.",diff:"Lines added and removed in the current session.",cost:"Estimated cost of the current session (client-side estimate).",time:"How long the current session has been running."};
+const COLOR_FIELDS=[["colors.pill_bg","Pill BG","Background color of all pill segments."],["colors.frame","Frame","Border frame color."],["colors.label","Labels","Label text color below pills."],["colors.dim","Dim text","Secondary text (units, separators)."],["colors.path","Path","Directory path text color."],["colors.branch","Branch","Git branch text color."],["colors.time","Time","Session duration text color."],["colors.diff_add","Diff +","Added lines color."],["colors.diff_sep","Diff sep","Separator between +/-."],["colors.diff_rm","Diff −","Removed lines color."]];
 
 let state=JSON.parse(JSON.stringify(DEFAULTS));
 
@@ -471,7 +471,7 @@ function renderPreview(){
   const fullPath=["~","dev","my-project","src","components"];
   const nSeg=s.path_segments;
   const demoPath=fullPath.length>nSeg?"\u2026/"+fullPath.slice(-nSeg).join("/"):fullPath.join("/");
-  const demo={model:modelNames[pvModel]||modelNames.opus,path:demoPath,pct:pvUsage,ctx:"1.0M",
+  const demo={model:modelNames[pvModel]||modelNames.opus,path:demoPath,branch:"main",pct:pvUsage,ctx:"1.0M",
     cost:1.85,time:"12m 34s",add:142,rm:38,rlPct:pvUsage,rlReset:"14:30",weekPct:Math.round(pvUsage*0.7),weekReset:"Mon"};
   const theme=s.colors.model_themes[pvModel]||s.colors.model_themes.fallback;
 
@@ -498,6 +498,7 @@ function renderPreview(){
     if(!pcfg.enabled)continue;const bw=pcfg.bar_width||10;const lbl=pcfg.label;
     if(key==="model")pills.push(makePill(`<b>${gradSpans(demo.model,theme[0],theme[1])}</b>`,lbl));
     else if(key==="path")pills.push(makePill(`<b><span style="color:${rgb(s.colors.path)}">${esc(demo.path)}</span></b>`,lbl));
+    else if(key==="branch")pills.push(makePill(`<b><span style="color:${rgb(s.colors.branch)}">${esc(demo.branch)}</span></b>`,lbl));
     else if(key==="context"){const c=tColor(pvUsage);pills.push(makePill(`<span style="color:${rgb(c)}"><b>${pvUsage}%</b></span><span style="color:${dimC}"> / ${demo.ctx}  </span>${bar(pvUsage,bw,c)}`,lbl))}
     else if(key==="rate"){const c=tColor(demo.rlPct);let html=`<span style="color:${rgb(c)}"><b>${demo.rlPct}%</b></span>  ${bar(demo.rlPct,bw,c)}<span style="color:${dimC}">  ${demo.rlReset}</span>`;if(pcfg.show_seven_day){const c7=tColor(demo.weekPct);html+=`<span style="color:${dimC}">  ·  </span><span style="color:${rgb(c7)}"><b>7d ${demo.weekPct}%</b></span>`}pills.push(makePill(html,lbl))}
     else if(key==="diff")pills.push(makePill(`<span style="color:${rgb(s.colors.diff_add)}"><b>+${demo.add}</b></span><span style="color:${rgb(s.colors.diff_sep)}">  </span><span style="color:${rgb(s.colors.diff_rm)}"><b>\u2212${demo.rm}</b></span>`,lbl));
@@ -544,7 +545,7 @@ function genYaml(){
   }
   L.push("colors:");
   L.push(`  pill_bg: ${c(s.colors.pill_bg)}`);L.push(`  frame: ${c(s.colors.frame)}`);L.push(`  label: ${c(s.colors.label)}`);
-  L.push(`  dim: ${c(s.colors.dim)}`);L.push(`  path: ${c(s.colors.path)}`);L.push(`  time: ${c(s.colors.time)}`);
+  L.push(`  dim: ${c(s.colors.dim)}`);L.push(`  path: ${c(s.colors.path)}`);L.push(`  branch: ${c(s.colors.branch)}`);L.push(`  time: ${c(s.colors.time)}`);
   L.push(`  diff_add: ${c(s.colors.diff_add)}`);L.push(`  diff_sep: ${c(s.colors.diff_sep)}`);L.push(`  diff_rm: ${c(s.colors.diff_rm)}`);
   L.push(`  cost_grad: ${g(s.colors.cost_grad)}`,"");
   // Map 'fallback' back to 'default' in YAML output

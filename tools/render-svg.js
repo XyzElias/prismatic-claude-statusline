@@ -31,6 +31,7 @@ const FRAME   = [120, 120, 138];
 const LABEL   = [128, 128, 150];
 const DIM     = [168, 162, 172];
 const PATHC   = [120, 200, 255];
+const BRANCHC = [180, 160, 255];
 const TIMEC   = [130, 210, 255];
 const DIFF_ADD = [60, 255, 110], DIFF_RM = [255, 75, 75], DIFF_SEP = [120, 140, 135];
 const COST_GRAD = [[255, 220, 60], [255, 170, 30]];
@@ -90,6 +91,7 @@ function makePills(o) {
   const theme = MODEL_THEMES[o.modelKey] || MODEL_THEMES.default;
   pills.push({ label: "MODEL", chars: grad(o.model, theme[0], theme[1]) });
   if (o.path) pills.push({ label: "PATH", chars: solid(o.path, PATHC, true) });
+  if (o.branch) pills.push({ label: "BRANCH", chars: solid(o.branch, BRANCHC, true) });
   if (o.ctxPct != null) {
     const c = thresholdColor(o.ctxPct);
     pills.push({ label: "CONTEXT", chars: cat(solid(o.ctxPct + "%", c, true), solid(" / " + o.ctxSize + "  ", DIM), bar(o.ctxPct, 10, c)) });
@@ -177,7 +179,7 @@ const write = (name, svg) => { fs.writeFileSync(path.join(OUT, name), svg, "utf-
 // ── 1) Hero — terminal window with a full subscriber status line ──
 function buildHero() {
   const pills = makePills({
-    model: "Fable 5", modelKey: "fable", path: "…/projects/statusline",
+    model: "Fable 5", modelKey: "fable", path: "…/projects/statusline", branch: "main",
     ctxPct: 42, ctxSize: "1.0M", w5: 23, reset5: "14:30",
     add: 142, rm: 38, cost: 1.85, time: "12m 34s",
   });
@@ -252,13 +254,14 @@ function buildContextStates() {
 // ── 4) Anatomy — labeled status line + numbered legend ──
 function buildAnatomy() {
   const pills = makePills({
-    model: "Opus 4.8", modelKey: "opus", path: "…/projects/statusline",
+    model: "Opus 4.8", modelKey: "opus", path: "…/projects/statusline", branch: "main",
     ctxPct: 42, ctxSize: "1.0M", w5: 23, reset5: "14:30",
     add: 142, rm: 38, cost: 1.85, time: "12m 34s",
   });
   const legend = [
     "MODEL    Active model, tinted by a per-model gradient",
     "PATH     Working directory (last 2 folders)",
+    "BRANCH   Current Git branch (hidden outside a repo)",
     "CONTEXT  Context window used, with a color-coded bar",
     "USAGE    Pro/Max rate-limit % + reset (hidden on API plans)",
     "DIFF     Lines added / removed this session",
@@ -300,7 +303,7 @@ function brandComposition(W, wordmarkY, wordmarkSize, lineOY, modelKey, modelNam
   s += `<text x="${W / 2}" y="${wordmarkY + wordmarkSize * 0.5 + 30}" ${SANS} font-size="15" text-anchor="middle" fill="rgb(120,122,140)">Highly customizable · truecolor gradients · zero dependencies</text>`;
   // centered sample status line
   const pills = makePills({
-    model: modelName, modelKey, path: "…/projects/statusline",
+    model: modelName, modelKey, path: "…/projects/statusline", branch: "main",
     ctxPct: 42, ctxSize: "1.0M", w5: 23, reset5: "14:30",
     add: 142, rm: 38, cost: 1.85, time: "12m 34s",
   });
@@ -328,7 +331,7 @@ function buildSocial() {
 // Self-contained CSS keyframes; animates on GitHub when used via <img>.
 function buildClip() {
   const pills = makePills({
-    model: "Fable 5", modelKey: "fable", path: "…/projects/statusline",
+    model: "Fable 5", modelKey: "fable", path: "…/projects/statusline", branch: "main",
     ctxPct: 42, ctxSize: "1.0M", w5: 23, reset5: "14:30",
     add: 142, rm: 38, cost: 1.85, time: "12m 34s",
   });
