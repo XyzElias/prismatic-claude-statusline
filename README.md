@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/banner.svg" alt="Prismatic — a truecolor, highly customizable status line for Claude Code" width="100%">
+<img src="assets/banner.svg?v=1.1" alt="Prismatic — a truecolor, highly customizable status line for Claude Code" width="100%">
 
 # Prismatic — Claude Code Status Line
 
@@ -23,7 +23,7 @@
 Claude Code lets you replace the bar at the bottom of the screen with the output of any script. This is a single, self-contained Node.js script (`statusline.js`) that turns that bar into a row of **gradient "pills"** showing your model, working directory, Git branch, context-window usage, subscription usage, session diff, cost, and elapsed time — wrapped in a rounded frame.
 
 <div align="center">
-<img src="assets/demo.svg" alt="Animated demo: gradient pills popping into the status line one after another" width="100%">
+<img src="assets/demo.svg?v=1.1" alt="Animated demo: gradient pills popping into the status line one after another" width="100%">
 <br>
 <em>Pills for model, path, branch, context, usage, diff, cost and time — in a rounded frame.</em>
 </div>
@@ -90,7 +90,7 @@ On first run the script creates `~/.claude/statusline_config.yml` with sensible 
 ## Anatomy
 
 <div align="center">
-<img src="assets/anatomy.svg" alt="Labeled diagram of every status line segment" width="100%">
+<img src="assets/anatomy.svg?v=1.1" alt="Labeled diagram of every status line segment" width="100%">
 </div>
 
 | # | Segment | What it shows | Source |
@@ -110,7 +110,7 @@ Every segment can be reordered, renamed, or turned off. See [Configuration](docs
 
 <div align="center">
 
-<img src="assets/hero.svg" alt="A full status line in a terminal window" width="100%">
+<img src="assets/hero.svg?v=1.1" alt="A full status line in a terminal window" width="100%">
 
 <br><br>
 
