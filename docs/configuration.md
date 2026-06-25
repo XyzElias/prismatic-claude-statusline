@@ -63,6 +63,7 @@ pills:
 |-----|-------|---------------|
 | `model` | Model name with a per-model gradient | — |
 | `path` | Working directory | controlled by top-level `path_segments` |
+| `branch` | Current Git branch | — (auto-hides outside a Git repository) |
 | `context` | Context-window usage + bar | `bar_width` |
 | `rate` | Pro/Max subscription usage | `bar_width`, `show_seven_day` |
 | `diff` | Lines added/removed this session | — (auto-hides when there are no changes) |
@@ -71,6 +72,8 @@ pills:
 
 - **`bar_width`** (context, rate) — the width of the progress bar in characters. Default `10`.
 - **`show_seven_day`** (rate) — when `true`, also shows the 7-day usage window next to the 5-hour one, e.g. `23% ━━━ 14:30 · 7d 41%`. Default `false`.
+
+> **About the BRANCH pill:** it shows the current Git branch of your working directory (or a short commit hash when in detached-HEAD state). It reads `.git/HEAD` directly — no `git` executable required, no latency — and works inside worktrees and submodules. When the directory isn't part of a Git repository, the pill simply doesn't show.
 
 > **About the USAGE pill:** it only appears for Claude **Pro/Max** subscribers, because Claude Code only sends rate-limit data to subscribers. On API / pay-per-use plans the pill simply doesn't show — no configuration needed. See [Why no monthly-budget pill](../README.md#why-no-monthly-budget-pill) for the reasoning.
 
@@ -87,6 +90,7 @@ colors:
   label:    [120, 120, 138]   # label text under pills
   dim:      [200, 185, 175]   # secondary text (units, separators, reset time)
   path:     [120, 200, 255]   # PATH text
+  branch:   [180, 160, 255]   # BRANCH (Git branch) text
   time:     [130, 210, 255]   # TIME text
   diff_add: [60, 255, 110]    # "+N" added lines
   diff_sep: [70, 95, 90]      # separator between + and −

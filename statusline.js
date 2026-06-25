@@ -147,10 +147,17 @@ pills:
     label: PATH
     order: 2
 
+  # Current Git branch of the working directory. Auto-hides when the directory
+  # is not inside a Git repository.
+  branch:
+    enabled: true
+    label: BRANCH
+    order: 3
+
   context:
     enabled: true
     label: CONTEXT
-    order: 3
+    order: 4
     bar_width: 10
 
   # Subscription usage (Claude Pro/Max). Auto-hides on API/pay-per-use plans,
@@ -158,25 +165,25 @@ pills:
   rate:
     enabled: true
     label: USAGE
-    order: 4
+    order: 5
     bar_width: 10
     show_seven_day: false   # also show the 7-day window next to the 5-hour one
 
   diff:
     enabled: true
     label: DIFF
-    order: 5
+    order: 6
 
   # Estimated cost of the CURRENT session (client-side estimate from Claude Code).
   cost:
     enabled: true
     label: COST
-    order: 6
+    order: 7
 
   time:
     enabled: true
     label: TIME
-    order: 7
+    order: 8
 
 colors:
   pill_bg: [58, 62, 72]
@@ -184,6 +191,7 @@ colors:
   label: [120, 120, 138]
   dim: [200, 185, 175]
   path: [120, 200, 255]
+  branch: [180, 160, 255]
   time: [130, 210, 255]
   diff_add: [60, 255, 110]
   diff_sep: [70, 95, 90]
@@ -231,7 +239,72 @@ function ensureConfig() {
   }
 }
 
+// ─── Config migration ───────────────────────────────────────
+// When the script gains a new pill or color, an EXISTING config file is missing
+// the corresponding keys. Rather than overwrite the file (which would wipe a
+// user's customizations and comments), we surgically insert only the missing
+// blocks at the top of their section — every existing line is left untouched.
+//
+// `MIGRATIONS` lists each addition: the section header to find, the key that
+// must exist there, and the YAML block to insert if it doesn't.
+const MIGRATIONS = [
+  {
+    section: "pills",
+    key: "branch",
+    block:
+      "  # Current Git branch of the working directory (added in v1.1).\n" +
+      "  # Auto-hides when the directory is not inside a Git repository.\n" +
+      "  branch:\n" +
+      "    enabled: true\n" +
+      "    label: BRANCH\n" +
+      "    order: 3\n",
+  },
+  {
+    section: "colors",
+    key: "branch",
+    block: "  branch: [180, 160, 255]\n",
+  },
+];
+
+// Insert `block` as the first child of the top-level `section:` map, but only
+// if a child named `key:` is not already present. Returns the (possibly
+// unchanged) text. Pure text surgery — existing lines are never modified.
+function insertIntoSection(text, section, key, block) {
+  const lines = text.split("\n");
+  const headerRe = new RegExp("^" + section + ":\\s*$");
+  let h = lines.findIndex((l) => headerRe.test(l));
+  if (h === -1) return text; // section absent — leave the file alone
+
+  // Walk the section's direct children (indent > 0) until the next top-level key.
+  const childKeyRe = new RegExp("^\\s+" + key + ":");
+  for (let i = h + 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+    const indent = line.search(/\S/);
+    if (indent === 0) break;       // reached the next top-level section
+    if (childKeyRe.test(line)) return text; // key already present — nothing to do
+  }
+
+  lines.splice(h + 1, 0, block.replace(/\n$/, ""));
+  return lines.join("\n");
+}
+
+// Bring an existing config file up to date with any new keys the script knows
+// about, without disturbing the user's existing settings or comments.
+function migrateConfig() {
+  let raw;
+  try { raw = fs.readFileSync(CFG_PATH, "utf-8"); } catch { return; }
+  let next = raw;
+  for (const m of MIGRATIONS) {
+    next = insertIntoSection(next, m.section, m.key, m.block);
+  }
+  if (next !== raw) {
+    try { fs.writeFileSync(CFG_PATH, next, "utf-8"); } catch {}
+  }
+}
+
 ensureConfig();
+migrateConfig();
 
 let CFG = {};
 try {
@@ -300,6 +373,46 @@ function gradient(text, start, end) {
   ).join("");
 }
 
+// ─── Git branch (zero-dependency, no subprocess) ────────────
+// Walks up from `cwd` to find a Git directory and reads HEAD directly, so it
+// adds no latency and works without `git` on PATH. Handles worktrees and
+// submodules (where `.git` is a file pointing at the real git dir) and the
+// detached-HEAD case (returns a short commit SHA). Returns null when the
+// directory is not inside a repository.
+function getGitBranch(cwd) {
+  if (!cwd) return null;
+  try {
+    let dir = path.resolve(cwd);
+    for (let i = 0; i < 64; i++) {
+      const dotGit = path.join(dir, ".git");
+      let gitDir = null;
+      try {
+        const st = fs.statSync(dotGit);
+        if (st.isDirectory()) {
+          gitDir = dotGit;
+        } else if (st.isFile()) {
+          // Worktree/submodule: ".git" is a file "gitdir: <path>".
+          const m = fs.readFileSync(dotGit, "utf-8").match(/gitdir:\s*(.+)/);
+          if (m) gitDir = path.resolve(dir, m[1].trim());
+        }
+      } catch {}
+
+      if (gitDir) {
+        const head = fs.readFileSync(path.join(gitDir, "HEAD"), "utf-8").trim();
+        const ref = head.match(/^ref:\s*refs\/heads\/(.+)$/);
+        if (ref) return ref[1];
+        // Detached HEAD — show a short commit hash.
+        return head.slice(0, 7);
+      }
+
+      const parent = path.dirname(dir);
+      if (parent === dir) break; // reached filesystem root
+      dir = parent;
+    }
+  } catch {}
+  return null;
+}
+
 // ─── Render ─────────────────────────────────────────────────
 function render(data) {
   const BG_PILL = col("colors.pill_bg", [58, 62, 72]);
@@ -346,6 +459,8 @@ function render(data) {
   const pathStr = parts.length > nSeg
     ? "…/" + parts.slice(-nSeg).join("/")
     : parts.join("/");
+
+  const gitBranch = getGitBranch(cwd);
 
   const ctx = data.context_window || {};
   const pct = Math.min(Math.round(ctx.used_percentage || 0), 100);
@@ -455,12 +570,21 @@ function render(data) {
     }});
   }
 
+  { // Git branch (only inside a repository)
+    const p = pillCfg("branch");
+    if (p && gitBranch) {
+      segments.push({ order: p.order || 3, build: () => {
+        addPill(BOLD + fgC(...col("colors.branch", [180, 160, 255])) + gitBranch + RST + bgC(...BG_PILL), p.label || "BRANCH");
+      }});
+    }
+  }
+
   { // Context window
     const p = pillCfg("context");
     if (p) {
       const bw = p.bar_width || 10;
       const ctxClr = thresholdColor(pct);
-      segments.push({ order: p.order || 3, build: () => {
+      segments.push({ order: p.order || 4, build: () => {
         addPill(
           fgC(...ctxClr) + BOLD + `${pct}%` + RST + bgC(...BG_PILL)
           + DIM_COLOR + ` / ${ctxFmt}  `
@@ -476,7 +600,7 @@ function render(data) {
     const showSeven = p && p.show_seven_day === true;
     if (p && (w5 || (showSeven && w7))) {
       const bw = p.bar_width || 10;
-      segments.push({ order: p.order || 4, build: () => {
+      segments.push({ order: p.order || 5, build: () => {
         let content = "";
         if (w5) {
           const c = thresholdColor(w5.pct);
@@ -497,7 +621,7 @@ function render(data) {
   { // Diff
     const p = pillCfg("diff");
     if (p && (linesAdd > 0 || linesRm > 0)) {
-      segments.push({ order: p.order || 5, build: () => {
+      segments.push({ order: p.order || 6, build: () => {
         addPill(
           fgC(...col("colors.diff_add", [60, 255, 110])) + BOLD + `+${linesAdd}` + RST + bgC(...BG_PILL)
           + fgC(...col("colors.diff_sep", [70, 95, 90])) + "  "
@@ -512,7 +636,7 @@ function render(data) {
     const p = pillCfg("cost");
     if (p) {
       const cg = cfg("colors.cost_grad", [[255, 220, 60], [255, 170, 30]]);
-      segments.push({ order: p.order || 6, build: () => {
+      segments.push({ order: p.order || 7, build: () => {
         addPill(
           BOLD + gradient(`$${costUsd.toFixed(2)}`, cg[0], cg[1]) + RST + bgC(...BG_PILL),
           p.label || "COST"
@@ -523,7 +647,7 @@ function render(data) {
 
   { // Session duration
     const p = pillCfg("time");
-    if (p) segments.push({ order: p.order || 7, build: () => {
+    if (p) segments.push({ order: p.order || 8, build: () => {
       addPill(BOLD + fgC(...col("colors.time", [130, 210, 255])) + duration + RST + bgC(...BG_PILL), p.label || "TIME");
     }});
   }

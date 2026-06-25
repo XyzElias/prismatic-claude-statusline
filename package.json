@@ -1,11 +1,13 @@
 {
   "name": "prismatic-claude-statusline",
-  "version": "1.0.0",
-  "description": "A prismatic, highly customizable, zero-dependency status line for Claude Code — truecolor gradient model pills, a color-coded context bar, and a live visual config editor.",
+  "version": "1.1.0",
+  "description": "A prismatic, highly customizable, zero-dependency status line for Claude Code — truecolor gradient model pills, a live Git branch pill, a color-coded context bar, and a live visual config editor.",
   "keywords": [
     "claude-code",
     "claude",
     "anthropic",
+    "git",
+    "git-branch",
     "statusline",
     "status-line",
     "status-bar",

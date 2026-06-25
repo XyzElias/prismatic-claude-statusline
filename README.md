@@ -20,12 +20,12 @@
 
 ## What is this?
 
-Claude Code lets you replace the bar at the bottom of the screen with the output of any script. This is a single, self-contained Node.js script (`statusline.js`) that turns that bar into a row of **gradient "pills"** showing your model, working directory, context-window usage, subscription usage, session diff, cost, and elapsed time — wrapped in a rounded frame.
+Claude Code lets you replace the bar at the bottom of the screen with the output of any script. This is a single, self-contained Node.js script (`statusline.js`) that turns that bar into a row of **gradient "pills"** showing your model, working directory, Git branch, context-window usage, subscription usage, session diff, cost, and elapsed time — wrapped in a rounded frame.
 
 <div align="center">
 <img src="assets/demo.svg" alt="Animated demo: gradient pills popping into the status line one after another" width="100%">
 <br>
-<em>Pills for model, path, context, usage, diff, cost and time — in a rounded frame.</em>
+<em>Pills for model, path, branch, context, usage, diff, cost and time — in a rounded frame.</em>
 </div>
 
 - **No dependencies.** One `.js` file. No `npm install`, no packages, nothing to keep updated.
@@ -80,6 +80,7 @@ On first run the script creates `~/.claude/statusline_config.yml` with sensible 
 ## Features
 
 - 🎨 **Per-model gradient themes** — the model name is tinted with a two-color gradient, so you can tell Opus from Sonnet from Haiku from Fable at a glance.
+- 🌿 **Live Git branch** — the branch of your working directory, right in the status line. Auto-hides when you're not inside a repository; reads `.git` directly, so it adds no latency and needs no `git` on your PATH.
 - 📊 **Color-coded context bar** — green when you have room, shading through yellow and orange to red as the context window fills.
 - 📈 **Subscription usage** — shows your Claude Pro/Max 5-hour rate-limit percentage and reset time. Automatically hidden on API / pay-per-use plans.
 - ✏️ **Session diff & cost** — lines added/removed and the estimated cost of the current session.
@@ -96,11 +97,12 @@ On first run the script creates `~/.claude/statusline_config.yml` with sensible 
 |---|---------|---------------|--------|
 | 1 | **MODEL** | Active model name, tinted by a per-model gradient | `model.display_name` |
 | 2 | **PATH** | Working directory (last *N* folders) | `workspace.current_dir` |
-| 3 | **CONTEXT** | Context window used, with a color-coded bar | `context_window.used_percentage` |
-| 4 | **USAGE** | Pro/Max rate-limit % + reset time *(hidden on API plans)* | `rate_limits.five_hour` |
-| 5 | **DIFF** | Lines added / removed this session | `cost.total_lines_*` |
-| 6 | **COST** | Estimated cost of the **current session** | `cost.total_cost_usd` |
-| 7 | **TIME** | Session duration | `cost.total_duration_ms` |
+| 3 | **BRANCH** | Current Git branch *(hidden outside a repo)* | `.git/HEAD` |
+| 4 | **CONTEXT** | Context window used, with a color-coded bar | `context_window.used_percentage` |
+| 5 | **USAGE** | Pro/Max rate-limit % + reset time *(hidden on API plans)* | `rate_limits.five_hour` |
+| 6 | **DIFF** | Lines added / removed this session | `cost.total_lines_*` |
+| 7 | **COST** | Estimated cost of the **current session** | `cost.total_cost_usd` |
+| 8 | **TIME** | Session duration | `cost.total_duration_ms` |
 
 Every segment can be reordered, renamed, or turned off. See [Configuration](docs/configuration.md).
 
@@ -132,6 +134,24 @@ Two ways to configure:
 </div>
 
 Changes take effect on your next interaction with Claude Code.
+
+## Updating
+
+Updating is the same one-liner you used to install — it overwrites **only** `statusline.js`:
+
+```bash
+# macOS / Linux / Git Bash
+curl -fsSL https://raw.githubusercontent.com/XyzElias/prismatic-claude-statusline/main/statusline.js -o ~/.claude/statusline.js
+```
+
+```powershell
+# Windows PowerShell
+curl.exe -fsSL https://raw.githubusercontent.com/XyzElias/prismatic-claude-statusline/main/statusline.js -o "$HOME\.claude\statusline.js"
+```
+
+Your `statusline_config.yml` is **never overwritten**, so every customization survives. When a new release adds a segment or color (like the **BRANCH** pill in v1.1), the script **migrates your config automatically**: on the next run it inserts only the new keys — with their default values and comments — and leaves every existing line, comment and custom value exactly as it was. The migration is idempotent, so running it again changes nothing.
+
+That means upgrading is a single command: download the new `statusline.js`, and your config grows to match it on the next message — nothing to merge by hand, nothing to reset. (See [the new keys for any release](docs/configuration.md#segments-pills).)
 
 ## Documentation
 
